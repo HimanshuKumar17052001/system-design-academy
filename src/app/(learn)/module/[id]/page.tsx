@@ -8,8 +8,10 @@ import { ModuleTabs } from "@/components/learn/ModuleTabs";
 import { ModuleLockGate } from "@/components/learn/ModuleLockGate";
 import { ModuleNotesDownloader } from "@/components/learn/ModuleNotesDownloader";
 import { AITutor } from "@/components/ai-tutor/AITutor";
+import { AITutorProvider } from "@/components/ai-tutor/AITutorContext";
 import { ConceptHighlighter } from "@/components/ai-tutor/ConceptHighlighter";
 import { QuizGenerator } from "@/components/ai-tutor/QuizGenerator";
+import { NotesCanvas } from "@/components/learn/NotesCanvas";
 import { Suspense } from "react";
 
 interface ModulePageProps {
@@ -55,6 +57,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
           </div>
           <div className="flex items-center gap-2">
             <QuizGenerator moduleTitle={module.title} />
+            <NotesCanvas moduleId={module.id} />
             <ModuleNotesDownloader module={module} />
           </div>
         </div>
@@ -85,8 +88,10 @@ export default async function ModulePage({ params }: ModulePageProps) {
         </Suspense>
       </ModuleLockGate>
 
-      <AITutor moduleTitle={module.title} moduleContent={module.lessons?.map(l => l.content.map(c => c.type === 'text' ? c.content : '').join(' ')).join(' ') || ''} />
-      <ConceptHighlighter />
+      <AITutorProvider>
+        <AITutor moduleTitle={module.title} moduleContent={module.lessons?.map(l => l.content.map(c => c.type === 'text' ? c.content : '').join(' ')).join(' ') || ''} />
+        <ConceptHighlighter />
+      </AITutorProvider>
     </div>
   );
 }

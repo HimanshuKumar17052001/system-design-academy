@@ -1,23 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sparkles, X, Loader2 } from "lucide-react";
-import { explainConcept } from "@/lib/groq";
+import { Sparkles } from "lucide-react";
+import { useAITutor } from "./AITutorContext";
 
 export function ConceptHighlighter() {
   const [selectedText, setSelectedText] = useState("");
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [showTooltip, setShowTooltip] = useState(false);
-  const [explanation, setExplanation] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
+  const { openTutor } = useAITutor();
 
   useEffect(() => {
     const handleSelection = () => {
       const selection = window.getSelection();
       const text = selection?.toString().trim();
 
-      if (text && text.length > 2 && text.length < 200) {
+      if (text && text.length > 2 && text.length < 300) {
         const range = selection?.getRangeAt(0);
         const rect = range?.getBoundingClientRect();
 
@@ -38,25 +36,13 @@ export function ConceptHighlighter() {
     return () => document.removeEventListener("mouseup", handleSelection);
   }, []);
 
-  const handleExplain = async () => {
+  const handleExplain = () => {
     setShowTooltip(false);
-    setShowPopup(true);
-    setIsLoading(true);
-    setExplanation("");
-
-    try {
-      const result = await explainConcept(selectedText);
-      setExplanation(result);
-    } catch (error) {
-      setExplanation("Sorry, couldn't explain. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+    openTutor(`Explain this concept: "${selectedText}"`);
   };
 
   return (
     <>
-      {/* Minimal Tooltip */}
       {showTooltip && (
         <button
           onClick={handleExplain}
@@ -68,39 +54,8 @@ export function ConceptHighlighter() {
           }}
         >
           <Sparkles className="size-3 text-muted-foreground" />
-          <span className="text-muted-foreground">Explain</span>
+          <span className="text-muted-foreground">Ask AI</span>
         </button>
-      )}
-
-      {/* Minimal Popup */}
-      {showPopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm"
-            onClick={() => setShowPopup(false)}
-          />
-          <div className="relative w-full max-w-sm rounded-lg border bg-popup p-3 shadow-lg">
-            <button
-              onClick={() => setShowPopup(false)}
-              className="absolute right-2 top-2 text-muted-foreground hover:text-foreground"
-            >
-              <X className="size-3.5" />
-            </button>
-
-            <p className="text-xs text-muted-foreground line-clamp-2 mb-2 pr-5">
-              "{selectedText}"
-            </p>
-
-            {isLoading ? (
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <Loader2 className="size-3 animate-spin" />
-                <span className="text-xs">Thinking...</span>
-              </div>
-            ) : (
-              <p className="text-sm">{explanation}</p>
-            )}
-          </div>
-        </div>
       )}
     </>
   );

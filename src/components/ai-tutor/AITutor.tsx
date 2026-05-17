@@ -5,6 +5,7 @@ import { MessageCircle, X, Send, Bot, User, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getAIResponse, type ChatMessage } from "@/lib/groq";
+import { useAITutor } from "./AITutorContext";
 
 interface AITutorProps {
   moduleTitle?: string;
@@ -18,7 +19,7 @@ const INITIAL_MESSAGE: ChatMessage = {
 };
 
 export function AITutor({ moduleTitle, moduleContent }: AITutorProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen: contextOpen, initialMessage, closeTutor, openTutor } = useAITutor();
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState("");
@@ -31,19 +32,21 @@ export function AITutor({ moduleTitle, moduleContent }: AITutorProps) {
   }, [messages]);
 
   useEffect(() => {
-    if (isOpen && inputRef.current) {
+    if (initialMessage && contextOpen) {
+      handleSendWithMessage(initialMessage);
+    }
+  }, [initialMessage, contextOpen]);
+
+  useEffect(() => {
+    if (contextOpen && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [isOpen]);
+  }, [contextOpen]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleSendWithMessage = async (msg: string) => {
+    if (isLoading) return;
 
-    const userMessage: ChatMessage = {
-      role: "user",
-      content: input.trim(),
-    };
-
+    const userMessage: ChatMessage = { role: "user", content: msg };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
@@ -52,24 +55,18 @@ export function AITutor({ moduleTitle, moduleContent }: AITutorProps) {
       const context = moduleTitle
         ? `User is currently learning: ${moduleTitle}. ${moduleContent?.slice(0, 500)}`
         : undefined;
-
       const response = await getAIResponse(messages, context);
-
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: response },
-      ]);
-    } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "Sorry, I'm having trouble connecting right now. Please try again.",
-        },
-      ]);
+      setMessages((prev) => [...prev, { role: "assistant", content: response }]);
+    } catch {
+      setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, I'm having trouble. Please try again." }]);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
+    await handleSendWithMessage(input.trim());
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -83,25 +80,25 @@ export function AITutor({ moduleTitle, moduleContent }: AITutorProps) {
     <>
       {/* Minimal Floating Button */}
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => openTutor()}
         className={cn(
           "fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full border bg-background px-4 py-2.5 shadow-sm transition-all hover:shadow-md",
-          isOpen && "hidden"
+          contextOpen && "hidden"
         )}
       >
         <MessageCircle className="size-4 text-muted-foreground" />
         <span className="text-sm font-medium text-muted-foreground">AI Help</span>
       </button>
 
-      {/* Chat Window - Minimal Design */}
-      {isOpen && (
+      {/* Chat Window */}
+      {contextOpen && (
         <div
           className={cn(
             "fixed bottom-6 right-6 z-50 flex flex-col rounded-xl border bg-background shadow-lg transition-all duration-200",
             isMinimized ? "h-14 w-64" : "h-[450px] w-[360px]"
           )}
         >
-          {/* Minimal Header */}
+          {/* Header */}
           <div
             className="flex items-center justify-between rounded-t-xl border-b px-3 py-2.5 cursor-pointer hover:bg-muted/50"
             onClick={() => setIsMinimized(!isMinimized)}
@@ -112,7 +109,7 @@ export function AITutor({ moduleTitle, moduleContent }: AITutorProps) {
               </div>
               <span className="text-sm font-medium">AI Tutor</span>
             </div>
-            <button className="text-muted-foreground hover:text-foreground">
+            <button onClick={closeTutor} className="text-muted-foreground hover:text-foreground">
               {isMinimized ? (
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="18 15 12 9 6 15"></polyline>
@@ -172,7 +169,7 @@ export function AITutor({ moduleTitle, moduleContent }: AITutorProps) {
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Minimal Input */}
+              {/* Input */}
               <div className="border-t p-2">
                 <div className="flex items-end gap-1 rounded-lg border bg-background focus-within:ring-1 focus-within:ring-muted-foreground/20">
                   <textarea
