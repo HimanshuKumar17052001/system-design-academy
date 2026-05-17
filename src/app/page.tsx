@@ -209,58 +209,75 @@ function PhaseCard({ phase, index }: { phase: typeof phases[0]; index: number })
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className="group relative aspect-[4/3] min-h-[220px] sm:min-h-[260px] cursor-pointer"
+      className="group relative cursor-pointer"
       style={{ perspective: "1000px" }}
       onClick={() => isMobile && setFlipped(!flipped)}
       onMouseEnter={() => !isMobile && setFlipped(true)}
       onMouseLeave={() => !isMobile && setFlipped(false)}
     >
       <motion.div
-        className="relative h-full w-full"
+        className="relative h-[280px] sm:h-[300px] w-full"
         style={{ transformStyle: "preserve-3d" }}
         animate={{ rotateY: flipped ? 180 : 0 }}
         transition={{ duration: 0.5, type: "spring", stiffness: 260, damping: 20 }}
       >
         {/* Front */}
         <div
-          className="absolute inset-0 rounded-xl border bg-card p-4 sm:p-5 transition-colors group-hover:border-primary/50 flex flex-col"
+          className="absolute inset-0 rounded-xl border bg-card p-5 sm:p-6 transition-colors group-hover:border-primary/50 flex flex-col"
           style={{ backfaceVisibility: "hidden" }}
         >
-          <div className="flex items-start justify-between shrink-0">
-            <div className="rounded-lg bg-primary/10 p-2">
-              <Icon className="size-4 sm:size-5 text-primary" />
+          <div className="flex items-start justify-between">
+            <div className="rounded-lg bg-primary/10 p-2.5">
+              <Icon className="size-5 sm:size-6 text-primary" />
             </div>
-            <span className="text-xs font-medium text-muted-foreground">
+            <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-md">
               {phase.number}
             </span>
           </div>
-          <div className="mt-auto pt-3">
-            <h3 className="font-semibold text-sm sm:text-base">{phase.title}</h3>
-            <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
+          
+          <div className="mt-4">
+            <h3 className="font-semibold text-base sm:text-lg">{phase.title}</h3>
+            <p className="mt-1 text-xs sm:text-sm text-muted-foreground font-medium">
               {phase.modules} modules
             </p>
-            <p className="mt-1.5 text-[10px] sm:text-xs text-muted-foreground leading-relaxed line-clamp-3">
-              {phase.description}
-            </p>
+          </div>
+          
+          <p className="mt-3 text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-3">
+            {phase.description}
+          </p>
+          
+          <div className="mt-auto pt-3 flex items-center gap-1.5 text-[10px] sm:text-xs text-muted-foreground/70">
+            <Info className="size-3" />
+            <span>{isMobile ? "Tap to see topics" : "Hover to see topics"}</span>
           </div>
         </div>
 
         {/* Back */}
         <div
-          className="absolute inset-0 rounded-xl border bg-primary/5 p-4 sm:p-5 flex flex-col overflow-hidden"
+          className="absolute inset-0 rounded-xl border bg-card p-5 sm:p-6 flex flex-col"
           style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
         >
-          <h3 className="font-semibold text-xs sm:text-sm shrink-0 mb-2 pb-2 border-b border-primary/10">
-            {phase.title} Topics
-          </h3>
-          <ul className="flex-1 overflow-y-auto space-y-1.5 pr-1 scrollbar-thin">
-            {phase.topics.map((topic, i) => (
-              <li key={i} className="flex items-start gap-2 text-[10px] sm:text-xs text-muted-foreground">
-                <CheckCircle className="size-2.5 sm:size-3 mt-0.5 shrink-0 text-primary/70" />
-                <span className="leading-snug">{topic}</span>
-              </li>
-            ))}
-          </ul>
+          <div className="flex items-center justify-between shrink-0 mb-3 pb-3 border-b">
+            <h3 className="font-semibold text-sm">{phase.title}</h3>
+            <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-md">
+              {phase.number}
+            </span>
+          </div>
+          <div className="flex-1 overflow-y-auto min-h-0">
+            <ul className="space-y-2">
+              {phase.topics.map((topic, i) => (
+                <li key={i} className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground">
+                  <CheckCircle className="size-3 sm:size-4 mt-0.5 shrink-0 text-primary/70" />
+                  <span className="leading-snug">{topic}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="mt-3 pt-3 border-t shrink-0">
+            <p className="text-[10px] sm:text-xs text-muted-foreground/70 text-center">
+              {phase.modules} modules · {phase.topics.length} topics
+            </p>
+          </div>
         </div>
       </motion.div>
     </motion.div>
