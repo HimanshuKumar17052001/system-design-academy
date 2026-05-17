@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   Clock,
   BookOpen,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +23,7 @@ import {
 import { useProgressStore } from "@/lib/progress";
 import { modules } from "@/data/curriculum";
 import { UserMenu } from "@/components/auth/UserMenu";
+import { GlobalSearch } from "@/components/shared/GlobalSearch";
 
 interface HeaderProps {
   onMenuToggle: () => void;
@@ -60,12 +62,29 @@ export function Header({ onMenuToggle }: HeaderProps) {
         <Menu className="size-5" />
       </Button>
 
+      <Button
+        variant="ghost"
+        size="icon"
+        className="md:hidden"
+        onClick={() => {
+          const event = new KeyboardEvent("keydown", { key: "k", metaKey: true });
+          document.dispatchEvent(event);
+        }}
+        aria-label="Search"
+      >
+        <Search className="size-5" />
+      </Button>
+
       <Link href="/dashboard" className="flex items-center gap-2">
         <BookOpen className="size-5 text-primary" />
         <span className="text-sm font-semibold tracking-tight md:text-base">
           System Design Academy
         </span>
       </Link>
+
+      <div className="hidden md:block flex-1 max-w-md mx-4">
+        <GlobalSearch />
+      </div>
 
       <div className="ml-auto flex items-center gap-3">
         <div className="hidden items-center gap-4 text-xs text-muted-foreground sm:flex">
