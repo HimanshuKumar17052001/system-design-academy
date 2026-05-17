@@ -72,13 +72,13 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
       <Button
         variant="outline"
         className={cn(
-          "relative h-9 w-9 justify-center p-0 md:w-64 md:justify-start md:text-sm md:p-0 md:pr-12",
+          "relative h-9 w-9 md:w-64 justify-center md:justify-start text-muted-foreground",
           className
         )}
         onClick={() => setOpen(true)}
         aria-label="Search modules"
       >
-        <Search className="size-4" />
+        <Search className="size-4 shrink-0" />
         <span className="hidden md:inline-flex ml-2">Search...</span>
         <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 md:flex">
           <span className="text-xs">⌘</span>K
@@ -95,8 +95,8 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
       />
 
       <div className="relative w-full max-w-xl rounded-xl border bg-popover shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center border-b px-3">
-          <Search className="mr-2 size-4 shrink-0 text-muted-foreground" />
+        <div className="flex items-center border-b px-3 py-2 gap-2">
+          <Search className="size-4 shrink-0 text-muted-foreground mt-0.5" />
           <input
             ref={inputRef}
             type="text"
@@ -104,9 +104,9 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex-1 h-8 bg-transparent text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
           />
-          <button onClick={() => setOpen(false)}>
+          <button onClick={() => setOpen(false)} className="shrink-0">
             <X className="size-4 text-muted-foreground hover:text-foreground" />
           </button>
         </div>
