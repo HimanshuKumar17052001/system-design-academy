@@ -6,6 +6,7 @@ import { getModuleById } from "@/data/curriculum";
 import { notFound } from "next/navigation";
 import { ModuleTabs } from "@/components/learn/ModuleTabs";
 import { ModuleLockGate } from "@/components/learn/ModuleLockGate";
+import { ModuleNotesDownloader } from "@/components/learn/ModuleNotesDownloader";
 import { Suspense } from "react";
 
 interface ModulePageProps {
@@ -39,14 +40,17 @@ export default async function ModulePage({ params }: ModulePageProps) {
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold tracking-tight">
-            <span className="text-muted-foreground">Module {module.number}:</span>{" "}
-            {module.title}
-          </h1>
-          <Badge variant="outline" className={difficultyColor[module.difficulty] || ""}>
-            {module.difficulty}
-          </Badge>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold tracking-tight">
+              <span className="text-muted-foreground">Module {module.number}:</span>{" "}
+              {module.title}
+            </h1>
+            <Badge variant="outline" className={difficultyColor[module.difficulty] || ""}>
+              {module.difficulty}
+            </Badge>
+          </div>
+          <ModuleNotesDownloader module={module} />
         </div>
         <p className="text-muted-foreground">{module.subtitle}</p>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
