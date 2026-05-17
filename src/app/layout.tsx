@@ -5,6 +5,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProgressProvider } from "@/components/shared/ProgressProvider";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { ThemeProvider } from "@/components/shared/ThemeProvider";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -41,7 +43,11 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <AuthProvider>
             <TooltipProvider>
-              <ProgressProvider>{children}</ProgressProvider>
+              <ProgressProvider>
+                {children}
+                <Analytics />
+                <SpeedInsights />
+              </ProgressProvider>
             </TooltipProvider>
           </AuthProvider>
         </ThemeProvider>
