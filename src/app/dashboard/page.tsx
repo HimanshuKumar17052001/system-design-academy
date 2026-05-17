@@ -26,6 +26,7 @@ import { useProgressStore } from "@/lib/progress";
 import { modules } from "@/data/curriculum";
 import type { ModuleCategory } from "@/types/curriculum";
 import { AppShell } from "@/components/layout/AppShell";
+import { ProgressTips } from "@/components/ai-tutor/ProgressTips";
 
 const categoryMeta: Record<
   ModuleCategory,
@@ -346,6 +347,8 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      <ProgressTips />
     </AppShell>
   );
 }
