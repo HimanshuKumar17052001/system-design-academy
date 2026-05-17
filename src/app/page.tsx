@@ -216,7 +216,7 @@ function PhaseCard({ phase, index }: { phase: typeof phases[0]; index: number })
       onMouseLeave={() => !isMobile && setFlipped(false)}
     >
       <motion.div
-        className="relative h-[280px] sm:h-[300px] w-full"
+        className="relative h-[340px] sm:h-[380px] w-full"
         style={{ transformStyle: "preserve-3d" }}
         animate={{ rotateY: flipped ? 180 : 0 }}
         transition={{ duration: 0.5, type: "spring", stiffness: 260, damping: 20 }}
@@ -254,27 +254,27 @@ function PhaseCard({ phase, index }: { phase: typeof phases[0]; index: number })
 
         {/* Back */}
         <div
-          className="absolute inset-0 rounded-xl border bg-card p-5 sm:p-6 flex flex-col"
+          className="absolute inset-0 rounded-xl border bg-card p-4 sm:p-5 flex flex-col justify-between"
           style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
         >
-          <div className="flex items-center justify-between shrink-0 mb-3 pb-3 border-b">
-            <h3 className="font-semibold text-sm">{phase.title}</h3>
-            <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-md">
-              {phase.number}
-            </span>
-          </div>
-          <div className="flex-1 overflow-y-auto min-h-0">
-            <ul className="space-y-2">
+          <div>
+            <div className="flex items-center justify-between mb-2 pb-2 border-b">
+              <h3 className="font-semibold text-xs sm:text-sm">{phase.title}</h3>
+              <span className="text-[10px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                {phase.number}
+              </span>
+            </div>
+            <ul className="space-y-1 sm:space-y-1.5">
               {phase.topics.map((topic, i) => (
-                <li key={i} className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground">
-                  <CheckCircle className="size-3 sm:size-4 mt-0.5 shrink-0 text-primary/70" />
-                  <span className="leading-snug">{topic}</span>
+                <li key={i} className="flex items-start gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-muted-foreground">
+                  <CheckCircle className="size-2.5 sm:size-3 mt-0.5 shrink-0 text-primary/70" />
+                  <span className="leading-tight sm:leading-snug">{topic}</span>
                 </li>
               ))}
             </ul>
           </div>
-          <div className="mt-3 pt-3 border-t shrink-0">
-            <p className="text-[10px] sm:text-xs text-muted-foreground/70 text-center">
+          <div className="pt-2 border-t">
+            <p className="text-[9px] sm:text-[10px] text-muted-foreground/60 text-center">
               {phase.modules} modules · {phase.topics.length} topics
             </p>
           </div>
@@ -319,7 +319,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-black text-foreground">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-black text-foreground">
       <ThemeToggle />
 
       {/* Hero Section */}
@@ -442,7 +442,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section className="border-y bg-muted/40 py-20">
+      <section className="border-y py-20">
         <div className="mx-auto max-w-6xl px-4 md:px-6">
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
