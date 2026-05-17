@@ -1,0 +1,121 @@
+import { createClient } from "@/lib/supabase/client";
+
+export interface UserProgress {
+  completedModules: string[];
+  moduleScores: Record<string, number>;
+  quizScores: Record<string, number>;
+  labCompletions: Record<string, boolean>;
+  bookmarks: string[];
+  lastVisited: string;
+  totalStudyTimeMinutes: number;
+}
+
+const TOTAL_MODULES = 50;
+const LOCAL_STORAGE_KEY = "sda-progress-unauthenticated";
+
+function isBrowser(): boolean {
+  return typeof window !== "undefined";
+}
+
+export async function syncProgressToDB(
+  userId: string,
+  progress: UserProgress
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = createClient();
+
+    const { error } = await supabase.from("user_progress").upsert(
+      {
+        user_id: userId,
+        completed_modules: progress.completedModules,
+        module_scores: progress.moduleScores,
+        quiz_scores: progress.quizScores,
+        lab_completions: progress.labCompletions,
+        bookmarks: progress.bookmarks,
+        last_visited: progress.lastVisited,
+        total_study_time_minutes: progress.totalStudyTimeMinutes,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" }
+    );
+
+    if (error) {
+      console.error("Failed to sync progress to DB:", error);
+      if (isBrowser()) {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(progress));
+      }
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    console.error("Unexpected error syncing progress:", message);
+    if (isBrowser()) {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(progress));
+    }
+    return { success: false, error: message };
+  }
+}
+
+export async function fetchProgressFromDB(
+  userId: string
+): Promise<UserProgress | null> {
+  try {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from("user_progress")
+      .select(
+        "completed_modules, module_scores, quiz_scores, lab_completions, bookmarks, last_visited, total_study_time_minutes"
+      )
+      .eq("user_id", userId)
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") {
+        return null;
+      }
+      console.error("Failed to fetch progress from DB:", error);
+      return null;
+    }
+
+    if (!data) return null;
+
+    return {
+      completedModules: data.completed_modules ?? [],
+      moduleScores: data.module_scores ?? {},
+      quizScores: data.quiz_scores ?? {},
+      labCompletions: data.lab_completions ?? {},
+      bookmarks: data.bookmarks ?? [],
+      lastVisited: data.last_visited ?? "",
+      totalStudyTimeMinutes: data.total_study_time_minutes ?? 0,
+    };
+  } catch (err) {
+    console.error(
+      "Unexpected error fetching progress:",
+      err instanceof Error ? err.message : err
+    );
+    return null;
+  }
+}
+
+export function isCourseComplete(userProgress: UserProgress): boolean {
+  return userProgress.completedModules.length >= TOTAL_MODULES;
+}
+
+export function getLocalStorageProgress(): UserProgress | null {
+  if (!isBrowser()) return null;
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as UserProgress;
+  } catch {
+    return null;
+  }
+}
+
+export function saveLocalStorageProgress(progress: UserProgress): void {
+  if (!isBrowser()) return;
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(progress));
+}
