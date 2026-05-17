@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Bot, User, Loader2 } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { MessageCircle, X, Send, Bot, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getAIResponse, type ChatMessage } from "@/lib/groq";
@@ -31,17 +31,34 @@ export function AITutor({ moduleTitle, moduleContent }: AITutorProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  useEffect(() => {
-    if (initialMessage && contextOpen) {
-      handleSendWithMessage(initialMessage);
-    }
-  }, [initialMessage, contextOpen]);
+  const [prevInitialMessage, setPrevInitialMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (contextOpen && inputRef.current) {
+    if (initialMessage && initialMessage !== prevInitialMessage) {
+      setPrevInitialMessage(initialMessage);
+      const userMessage: ChatMessage = { role: "user", content: initialMessage };
+      setMessages([INITIAL_MESSAGE, userMessage]);
+      setInput("");
+      setIsLoading(true);
+
+      getAIResponse([{ role: "user", content: initialMessage }], moduleTitle ? `User is currently learning: ${moduleTitle}. ${moduleContent?.slice(0, 500)}` : undefined)
+        .then((response) => {
+          setMessages((prev) => [...prev, { role: "assistant", content: response }]);
+        })
+        .catch(() => {
+          setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, I'm having trouble connecting. Please try again." }]);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [initialMessage]);
+
+  useEffect(() => {
+    if (contextOpen && inputRef.current && !initialMessage) {
       inputRef.current.focus();
     }
-  }, [contextOpen]);
+  }, [contextOpen, initialMessage]);
 
   const handleSendWithMessage = async (msg: string) => {
     if (isLoading) return;
@@ -55,7 +72,7 @@ export function AITutor({ moduleTitle, moduleContent }: AITutorProps) {
       const context = moduleTitle
         ? `User is currently learning: ${moduleTitle}. ${moduleContent?.slice(0, 500)}`
         : undefined;
-      const response = await getAIResponse(messages, context);
+      const response = await getAIResponse([...messages, userMessage], context);
       setMessages((prev) => [...prev, { role: "assistant", content: response }]);
     } catch {
       setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, I'm having trouble. Please try again." }]);
@@ -162,7 +179,11 @@ export function AITutor({ moduleTitle, moduleContent }: AITutorProps) {
                       <Bot className="size-3 text-muted-foreground" />
                     </div>
                     <div className="flex items-center gap-1 bg-muted rounded-lg px-2.5 py-1.5">
-                      <Loader2 className="size-3 animate-spin text-muted-foreground" />
+                      <div className="flex items-center gap-1">
+                        <span className="size-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <span className="size-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <span className="size-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "300ms" }} />
+                      </div>
                     </div>
                   </div>
                 )}
