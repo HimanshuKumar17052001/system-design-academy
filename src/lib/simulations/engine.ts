@@ -59,6 +59,16 @@ export function runSimulation(
       return runSystemDesignCanvasSimulation();
     case "pitfall-detector":
       return runPitfallDetectorSimulation();
+    case "load-balancer":
+      return runStub("Load Balancer", "Configure load balancing algorithms and observe traffic distribution.");
+    case "consistent-hash":
+      return runStub("Consistent Hash", "Visualize consistent hashing with virtual nodes.");
+    case "traffic-simulator":
+      return runStub("Traffic Flow", "Observe request flow through CDN, cache, and origin.");
+    case "db-scaling":
+      return runStub("DB Scaling", "Compare vertical vs horizontal database scaling.");
+    case "mq-visualizer":
+      return runStub("Message Queue", "Visualize message queue processing with consumers.");
     default:
       return {
         title: "Simulation Result",
