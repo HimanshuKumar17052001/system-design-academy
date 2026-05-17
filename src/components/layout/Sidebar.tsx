@@ -205,11 +205,15 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                       />
                     </button>
                   ) : (
-                    <div className="flex justify-center py-2">
+                    <button
+                      className="flex w-full justify-center py-2 cursor-pointer hover:bg-accent/50 rounded-lg transition-colors"
+                      onClick={() => setExpanded(true)}
+                      aria-label={`Expand ${categoryLabels[cat]} category`}
+                    >
                       <div className="rounded-lg bg-primary/10 p-2">
                         <CatIcon className="size-4 text-primary" />
                       </div>
-                    </div>
+                    </button>
                   )}
 
                   <AnimatePresence>
