@@ -4,6 +4,7 @@ import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProgressProvider } from "@/components/shared/ProgressProvider";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { ThemeProvider } from "@/components/shared/ThemeProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -35,13 +36,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+    <html lang="en" className={`${inter.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
-        <AuthProvider>
-          <TooltipProvider>
-            <ProgressProvider>{children}</ProgressProvider>
-          </TooltipProvider>
-        </AuthProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <AuthProvider>
+            <TooltipProvider>
+              <ProgressProvider>{children}</ProgressProvider>
+            </TooltipProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

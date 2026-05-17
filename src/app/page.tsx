@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   BookOpen,
@@ -18,10 +19,17 @@ import {
   Award,
   Users,
   BarChart3,
+  Info,
+  X,
+  Moon,
+  Sun,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { AuthModal } from "@/components/auth/AuthModal";
+import { useTheme } from "next-themes";
 
 const phases = [
   {
@@ -30,6 +38,15 @@ const phases = [
     modules: 7,
     icon: BookOpen,
     description: "HTTP, DNS, CDN, APIs, Databases, Scaling, Estimation",
+    topics: [
+      "HTTP/1.1 vs HTTP/2 vs HTTP/3",
+      "DNS resolution flow",
+      "CDN caching strategies",
+      "REST vs GraphQL vs gRPC",
+      "SQL vs NoSQL databases",
+      "Vertical vs Horizontal scaling",
+      "Back-of-envelope estimation",
+    ],
   },
   {
     number: "02",
@@ -37,6 +54,16 @@ const phases = [
     modules: 8,
     icon: Layers,
     description: "OOP, SOLID, Design Patterns, UML, Case Studies",
+    topics: [
+      "OOP principles & classes",
+      "SOLID principles deep dive",
+      "Creational patterns (Singleton, Factory)",
+      "Structural patterns (Adapter, Decorator)",
+      "Behavioral patterns (Observer, Strategy)",
+      "UML class & sequence diagrams",
+      "Design Parking Lot system",
+      "Design Elevator system",
+    ],
   },
   {
     number: "03",
@@ -44,6 +71,17 @@ const phases = [
     modules: 9,
     icon: Server,
     description: "Load Balancing, Caching, Messaging, CAP, Consistency",
+    topics: [
+      "Load balancer algorithms",
+      "Cache eviction strategies",
+      "CDN architecture",
+      "Database sharding & replication",
+      "Message queues & pub-sub",
+      "CAP theorem trade-offs",
+      "Rate limiting algorithms",
+      "Consistent hashing",
+      "Distributed transactions",
+    ],
   },
   {
     number: "04",
@@ -51,6 +89,15 @@ const phases = [
     modules: 7,
     icon: Boxes,
     description: "Microservices, Event-Driven, CQRS, Sagas, Kubernetes",
+    topics: [
+      "Monolith vs Microservices",
+      "API Gateway patterns",
+      "Event-driven architecture",
+      "CQRS & Event Sourcing",
+      "Saga pattern (orchestration vs choreography)",
+      "Circuit breaker pattern",
+      "Kubernetes fundamentals",
+    ],
   },
   {
     number: "05",
@@ -58,6 +105,13 @@ const phases = [
     modules: 5,
     icon: ShieldCheck,
     description: "Observability, Deployments, DR, Chaos Engineering",
+    topics: [
+      "Observability (metrics, logs, traces)",
+      "Blue-Green & Canary deployments",
+      "Disaster recovery strategies",
+      "Chaos engineering principles",
+      "Auto-scaling policies",
+    ],
   },
   {
     number: "06",
@@ -65,6 +119,16 @@ const phases = [
     modules: 8,
     icon: Globe,
     description: "URL Shortener, Twitter, Uber, YouTube, Search",
+    topics: [
+      "Design URL Shortener (Base62)",
+      "Design Rate Limiter",
+      "Design Twitter feed",
+      "Design WhatsApp messaging",
+      "Design YouTube video streaming",
+      "Design Uber ride matching",
+      "Design Amazon e-commerce",
+      "Design Search Autocomplete",
+    ],
   },
   {
     number: "07",
@@ -72,6 +136,13 @@ const phases = [
     modules: 5,
     icon: Sparkles,
     description: "Real-Time, ML Systems, Security, Payments, Global Scale",
+    topics: [
+      "WebSocket & SSE real-time systems",
+      "ML serving pipelines",
+      "Security (JWT, OAuth, mTLS)",
+      "Payment processing & idempotency",
+      "Multi-region global scale",
+    ],
   },
   {
     number: "08",
@@ -79,6 +150,12 @@ const phases = [
     modules: 4,
     icon: MessageSquareCode,
     description: "Framework, Mock Interviews, Pitfalls, Cheat Sheets",
+    topics: [
+      "4-step interview framework",
+      "45-min mock interview timer",
+      "Common pitfalls to avoid",
+      "Quick reference cheat sheets",
+    ],
   },
 ];
 
@@ -115,9 +192,131 @@ const features = [
   },
 ];
 
+function PhaseCard({ phase, index }: { phase: typeof phases[0]; index: number }) {
+  const [flipped, setFlipped] = useState(false);
+  const Icon = phase.icon;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.05 }}
+      className="relative h-64 cursor-pointer"
+      style={{ perspective: "1000px" }}
+      onClick={() => setFlipped(!flipped)}
+    >
+      <motion.div
+        className="relative h-full w-full"
+        style={{ transformStyle: "preserve-3d" }}
+        animate={{ rotateY: flipped ? 180 : 0 }}
+        transition={{ duration: 0.6, type: "spring", stiffness: 260, damping: 20 }}
+      >
+        {/* Front */}
+        <div
+          className="absolute inset-0 rounded-xl border bg-card p-6 transition-colors hover:border-primary/50"
+          style={{ backfaceVisibility: "hidden" }}
+        >
+          <div className="flex items-start justify-between">
+            <div className="rounded-lg bg-primary/10 p-2">
+              <Icon className="size-5 text-primary" />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-muted-foreground">
+                {phase.number}
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-7"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFlipped(true);
+                }}
+              >
+                <Info className="size-4 text-muted-foreground hover:text-primary" />
+              </Button>
+            </div>
+          </div>
+          <h3 className="mt-4 font-semibold">{phase.title}</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {phase.modules} modules
+          </p>
+          <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
+            {phase.description}
+          </p>
+        </div>
+
+        {/* Back */}
+        <div
+          className="absolute inset-0 rounded-xl border bg-primary/5 p-6"
+          style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-sm">{phase.title} Topics</h3>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-6"
+              onClick={(e) => {
+                e.stopPropagation();
+                setFlipped(false);
+              }}
+            >
+              <X className="size-4" />
+            </Button>
+          </div>
+          <ul className="space-y-1.5">
+            {phase.topics.map((topic, i) => (
+              <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                <CheckCircle className="size-3 mt-0.5 shrink-0 text-primary/70" />
+                <span>{topic}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      aria-label="Toggle theme"
+      className="fixed top-4 right-4 z-50"
+    >
+      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+    </Button>
+  );
+}
+
 export default function LandingPage() {
+  const { isAuthenticated } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
+
+  const handleStartLearning = () => {
+    if (!isAuthenticated) {
+      setAuthOpen(true);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <ThemeToggle />
+
       {/* Hero Section */}
       <section className="relative overflow-hidden border-b">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5" />
@@ -142,12 +341,19 @@ export default function LandingPage() {
               your next system design interview.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href="/dashboard">
-                <Button size="lg" className="gap-2 text-base">
+              {isAuthenticated ? (
+                <Link href="/dashboard">
+                  <Button size="lg" className="gap-2 text-base">
+                    Start Learning
+                    <ArrowRight className="size-4" />
+                  </Button>
+                </Link>
+              ) : (
+                <Button size="lg" className="gap-2 text-base" onClick={handleStartLearning}>
                   Start Learning
                   <ArrowRight className="size-4" />
                 </Button>
-              </Link>
+              )}
               <a
                 href="https://github.com/HimanshuKumar17052001/system-design-academy"
                 target="_blank"
@@ -205,7 +411,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Curriculum Phases */}
+      {/* Curriculum Phases with Flip Cards */}
       <section className="py-20">
         <div className="mx-auto max-w-6xl px-4 md:px-6">
           <div className="mb-12 text-center">
@@ -215,36 +421,14 @@ export default function LandingPage() {
             <p className="mt-4 text-muted-foreground">
               8 phases covering everything from basics to expert-level system design
             </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Click the <Info className="inline size-3" /> icon on any card to see topics
+            </p>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {phases.map((phase, i) => {
-              const Icon = phase.icon;
-              return (
-                <motion.div
-                  key={phase.number}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="group rounded-xl border bg-card p-6 transition-colors hover:border-primary/50"
-                >
-                  <div className="mb-4 flex items-center justify-between">
-                    <div className="rounded-lg bg-primary/10 p-2">
-                      <Icon className="size-5 text-primary" />
-                    </div>
-                    <span className="text-xs font-medium text-muted-foreground">
-                      {phase.number}
-                    </span>
-                  </div>
-                  <h3 className="font-semibold">{phase.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {phase.modules} modules
-                  </p>
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    {phase.description}
-                  </p>
-                </motion.div>
-              );
-            })}
+            {phases.map((phase, i) => (
+              <PhaseCard key={phase.number} phase={phase} index={i} />
+            ))}
           </div>
         </div>
       </section>
@@ -301,12 +485,19 @@ export default function LandingPage() {
               Your certificate awaits at the finish line.
             </p>
             <div className="mt-8">
-              <Link href="/dashboard">
-                <Button size="lg" className="gap-2 text-base">
+              {isAuthenticated ? (
+                <Link href="/dashboard">
+                  <Button size="lg" className="gap-2 text-base">
+                    Start Learning Now
+                    <ArrowRight className="size-4" />
+                  </Button>
+                </Link>
+              ) : (
+                <Button size="lg" className="gap-2 text-base" onClick={handleStartLearning}>
                   Start Learning Now
                   <ArrowRight className="size-4" />
                 </Button>
-              </Link>
+              )}
             </div>
             <p className="mt-4 text-xs text-muted-foreground">
               Free forever. No credit card required.
@@ -332,6 +523,9 @@ export default function LandingPage() {
           </p>
         </div>
       </footer>
+
+      {/* Auth Modal */}
+      <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
     </div>
   );
 }
