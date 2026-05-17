@@ -9,6 +9,7 @@ import {
   Clock,
   BookOpen,
   Search,
+  HelpCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -87,6 +88,13 @@ export function Header({ onMenuToggle }: HeaderProps) {
       </div>
 
       <div className="ml-auto flex items-center gap-3">
+        <Link href="/quiz">
+          <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
+            <HelpCircle className="size-3.5" />
+            <span className="hidden sm:inline">Quizzes</span>
+          </Button>
+        </Link>
+        
         <div className="hidden items-center gap-4 text-xs text-muted-foreground sm:flex">
           <div className="flex items-center gap-1">
             <CheckCircle2 className="size-3.5 text-emerald-500" />

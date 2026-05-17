@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useProgressStore } from "@/lib/progress";
+import { cn } from "@/lib/utils";
 import type { QuizDefinition, Question } from "@/types/curriculum";
 import MultipleChoiceQuestion from "./MultipleChoiceQuestion";
 import DragDropQuestion from "./DragDropQuestion";
@@ -187,6 +188,9 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
         </div>
         {quiz.questions.map((q, idx) => {
           const score = getQuestionScore(q, answers[idx]);
+          const isCorrect = score >= 1;
+          const isPartial = score > 0 && score < 1;
+          
           return (
             <Card key={idx} className="overflow-hidden">
               <CardContent className="p-6 space-y-4">
@@ -194,10 +198,10 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
                   <Badge variant="outline">Question {idx + 1}</Badge>
                   <Badge
                     variant={
-                      score >= 1 ? "default" : score > 0 ? "secondary" : "destructive"
+                      isCorrect ? "default" : isPartial ? "secondary" : "destructive"
                     }
                   >
-                    {Math.round(score * 100)}%
+                    {isCorrect ? "Correct" : isPartial ? "Partially Correct" : "Incorrect"}
                   </Badge>
                 </div>
                 <QuestionRenderer
@@ -208,6 +212,19 @@ export default function QuizEngine({ quiz }: QuizEngineProps) {
                   onCheck={() => {}}
                   reviewMode={true}
                 />
+                {"explanation" in q && q.explanation && (
+                  <div className={cn(
+                    "rounded-lg p-4 text-sm",
+                    isCorrect 
+                      ? "bg-emerald-50 border border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800" 
+                      : "bg-amber-50 border border-amber-200 dark:bg-amber-950/30 dark:border-amber-800"
+                  )}>
+                    <p className="font-medium mb-1">
+                      {isCorrect ? "✓ Correct Answer" : isPartial ? "◐ Partially Correct" : "✗ Incorrect Answer"}
+                    </p>
+                    <p className="text-muted-foreground">{q.explanation}</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           );
