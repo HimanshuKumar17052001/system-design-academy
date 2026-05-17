@@ -145,7 +145,7 @@ export default function DashboardPage() {
     <AppShell>
       <div className="mx-auto max-w-6xl space-y-8">
         {/* Hero */}
-        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 px-6 py-10 text-white md:px-10 md:py-14">
+        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 px-6 py-10 md:px-10 md:py-14">
           <div className="absolute inset-0 opacity-10">
             <div className="absolute -right-10 -top-10 size-64 rounded-full bg-blue-500 blur-3xl" />
             <div className="absolute -bottom-10 -left-10 size-64 rounded-full bg-indigo-500 blur-3xl" />

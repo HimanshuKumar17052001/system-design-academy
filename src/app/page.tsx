@@ -333,7 +333,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-black text-foreground">
+    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted text-foreground">
       <ThemeToggle />
 
       {/* Hero Section */}
