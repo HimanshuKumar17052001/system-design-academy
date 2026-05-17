@@ -13,13 +13,13 @@ function getGroqClient(): Groq {
   return groqClient;
 }
 
-const MODEL = process.env.GROQ_MODEL;
-
-if (!MODEL) {
-  throw new Error("GROQ_MODEL environment variable is not set");
+function getModel(): string {
+  const model = process.env.GROQ_MODEL;
+  if (!model) {
+    throw new Error("GROQ_MODEL environment variable is not set");
+  }
+  return model;
 }
-
-const model: string = MODEL;
 
 const SYSTEM_PROMPT = `You are an expert System Design tutor. Your role is to help users learn system design concepts clearly and effectively.
 
@@ -49,7 +49,7 @@ export async function getAIResponse(
     ];
 
     const completion = await getGroqClient().chat.completions.create({
-      model: model,
+      model: getModel(),
       messages: chatMessages,
       temperature: 0.7,
       max_tokens: 1024,
@@ -68,7 +68,7 @@ export async function explainConcept(
 ): Promise<string> {
   try {
     const completion = await getGroqClient().chat.completions.create({
-      model: model,
+      model: getModel(),
       messages: [
         {
           role: "system",
@@ -93,7 +93,7 @@ export async function generateQuiz(
 ): Promise<string> {
   try {
     const completion = await getGroqClient().chat.completions.create({
-      model: model,
+      model: getModel(),
       messages: [
         {
           role: "system",
