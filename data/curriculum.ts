@@ -103,6 +103,20 @@ export const modules: Module[] = [
             content:
               "Use the phrase 'It depends on...' often. Interviewers want to see conditional reasoning, not dogma.",
           },
+          {
+            type: "mermaid",
+            title: "System Design Process Flow",
+            caption: "The 4-step process every system design interview follows",
+            code: `flowchart LR
+    A[1. Clarify<br/>Requirements] --> B[2. High-Level<br/>Design]
+    B --> C[3. Deep Dive]
+    C --> D[4. Trade-offs<br/>& Wrap-up]
+    
+    style A fill:#3b82f6,stroke:#2563eb,color:#fff
+    style B fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    style C fill:#f59e0b,stroke:#d97706,color:#fff
+    style D fill:#10b981,stroke:#059669,color:#fff`,
+          },
         ],
       },
     ],

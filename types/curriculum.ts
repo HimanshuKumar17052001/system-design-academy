@@ -35,6 +35,7 @@ export interface Lesson {
 export type ContentBlock =
   | { type: "text"; content: string }
   | { type: "diagram"; kind: DiagramKind; caption: string }
+  | { type: "mermaid"; code: string; title?: string; caption?: string }
   | { type: "code"; language: string; code: string; runnable: boolean }
   | { type: "interactive"; component: string; props?: Record<string, unknown> }
   | { type: "callout"; variant: "info" | "warning" | "tip" | "success"; content: string }

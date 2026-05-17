@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle2, Circle, BookOpen } from "lucide-react";
+import { MermaidDiagram } from "./MermaidDiagram";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -179,6 +180,15 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             <p className="mt-2 text-xs text-muted-foreground">{block.caption}</p>
           )}
         </motion.div>
+      );
+
+    case "mermaid":
+      return (
+        <MermaidDiagram
+          code={block.code}
+          title={block.title}
+          caption={block.caption}
+        />
       );
 
     case "interactive":
