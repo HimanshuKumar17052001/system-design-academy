@@ -29,16 +29,13 @@ export function UserMenu() {
   const { user, isAuthenticated, signOut } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [isSigningOut, setIsSigningOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { theme, setTheme } = useTheme();
 
-  const handleSignOut = async () => {
-    if (isSigningOut) return;
-    setIsSigningOut(true);
+  const handleSignOut = () => {
     setDropdownOpen(false);
-    signOut().then(() => router.replace("/")).catch(() => router.replace("/"));
+    router.replace("/");
   };
 
   const handleThemeToggle = () => {
@@ -137,11 +134,10 @@ export function UserMenu() {
           <div className="border-t pt-1">
             <button
               onClick={handleSignOut}
-              disabled={isSigningOut}
-              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-destructive hover:bg-accent rounded-md cursor-pointer disabled:opacity-50"
+              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-destructive hover:bg-accent rounded-md cursor-pointer"
             >
-              <LogOut className={cn("size-4", isSigningOut && "animate-spin")} />
-              {isSigningOut ? "Signing out..." : "Sign Out"}
+              <LogOut className="size-4" />
+              Sign Out
             </button>
           </div>
         </div>
