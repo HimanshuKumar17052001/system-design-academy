@@ -1,4 +1,10 @@
-const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+import { Groq } from "groq-sdk";
+
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
+
+const MODEL = "openai/gpt-oss-120b";
 
 const SYSTEM_PROMPT = `You are an expert System Design tutor. Your role is to help users learn system design concepts clearly and effectively.
 
@@ -13,8 +19,6 @@ Guidelines:
 
 Current topic context: System Design & Architecture (HTTP, DNS, Databases, Load Balancing, Caching, Microservices, Scalability, etc.)`;
 
-const MODEL = "llama-3.1-70b-instruct";
-
 export async function getAIResponse(
   messages: ChatMessage[],
   customContext?: string
@@ -24,33 +28,19 @@ export async function getAIResponse(
       ? `\n\nAdditional context about the current module:\n${customContext}`
       : "";
 
-    const response = await fetch(GROQ_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          {
-            role: "system",
-            content: SYSTEM_PROMPT + contextPrompt,
-          },
-          ...messages.slice(-10),
-        ],
-        temperature: 0.7,
-        max_tokens: 1024,
-      }),
+    const chatMessages = [
+      { role: "system" as const, content: SYSTEM_PROMPT + contextPrompt },
+      ...messages.slice(-10).map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
+    ];
+
+    const completion = await groq.chat.completions.create({
+      model: MODEL,
+      messages: chatMessages,
+      temperature: 0.7,
+      max_tokens: 1024,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || "Failed to get AI response");
-    }
-
-    const data = await response.json();
-    return data.choices[0]?.message?.content || "Sorry, I couldn't generate a response.";
+    return completion.choices[0]?.message?.content || "Sorry, I couldn't generate a response.";
   } catch (error) {
     console.error("Groq API error:", error);
     throw error;
@@ -62,36 +52,20 @@ export async function explainConcept(
   context?: string
 ): Promise<string> {
   try {
-    const response = await fetch(GROQ_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          {
-            role: "system",
-            content: `You are an expert System Design tutor. Explain the following concept simply and clearly. Use analogies, examples, and keep it concise (2-4 sentences). ${context ? `Context: ${context}` : ""}`,
-          },
-          {
-            role: "user",
-            content: concept,
-          },
-        ],
-        temperature: 0.7,
-        max_tokens: 300,
-      }),
+    const completion = await groq.chat.completions.create({
+      model: MODEL,
+      messages: [
+        {
+          role: "system",
+          content: `You are an expert System Design tutor. Explain the following concept simply and clearly. Use analogies, examples, and keep it concise (2-4 sentences). ${context ? `Context: ${context}` : ""}`,
+        },
+        { role: "user", content: concept },
+      ],
+      temperature: 0.7,
+      max_tokens: 300,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || "Failed to explain concept");
-    }
-
-    const data = await response.json();
-    return data.choices[0]?.message?.content || "Sorry, I couldn't explain this concept.";
+    return completion.choices[0]?.message?.content || "Sorry, I couldn't explain this concept.";
   } catch (error) {
     console.error("Groq API error:", error);
     throw error;
@@ -103,18 +77,12 @@ export async function generateQuiz(
   numQuestions: number = 5
 ): Promise<string> {
   try {
-    const response = await fetch(GROQ_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          {
-            role: "system",
-            content: `You are an expert System Design tutor. Generate ${numQuestions} multiple choice quiz questions about the topic: "${topic}". 
+    const completion = await groq.chat.completions.create({
+      model: MODEL,
+      messages: [
+        {
+          role: "system",
+          content: `You are an expert System Design tutor. Generate ${numQuestions} multiple choice quiz questions about the topic: "${topic}". 
 
 Format each question as:
 Q#. Question text
@@ -125,20 +93,13 @@ D) Option 4
 Answer: [letter]
 
 Make questions practical and interview-focused. Include 1-2 sentence explanation for correct answer.`,
-          },
-        ],
-        temperature: 0.7,
-        max_tokens: 1500,
-      }),
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 1500,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || "Failed to generate quiz");
-    }
-
-    const data = await response.json();
-    return data.choices[0]?.message?.content || "Sorry, I couldn't generate a quiz.";
+    return completion.choices[0]?.message?.content || "Sorry, I couldn't generate a quiz.";
   } catch (error) {
     console.error("Groq API error:", error);
     throw error;
