@@ -1,8 +1,17 @@
 import { Groq } from "groq-sdk";
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
+let groqClient: Groq | null = null;
+
+function getGroqClient(): Groq {
+  if (!groqClient) {
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) {
+      throw new Error("GROQ_API_KEY environment variable is not set");
+    }
+    groqClient = new Groq({ apiKey });
+  }
+  return groqClient;
+}
 
 const MODEL = process.env.GROQ_MODEL;
 
@@ -39,7 +48,7 @@ export async function getAIResponse(
       ...messages.slice(-10).map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
     ];
 
-    const completion = await groq.chat.completions.create({
+    const completion = await getGroqClient().chat.completions.create({
       model: model,
       messages: chatMessages,
       temperature: 0.7,
@@ -58,7 +67,7 @@ export async function explainConcept(
   context?: string
 ): Promise<string> {
   try {
-    const completion = await groq.chat.completions.create({
+    const completion = await getGroqClient().chat.completions.create({
       model: model,
       messages: [
         {
@@ -83,7 +92,7 @@ export async function generateQuiz(
   numQuestions: number = 5
 ): Promise<string> {
   try {
-    const completion = await groq.chat.completions.create({
+    const completion = await getGroqClient().chat.completions.create({
       model: model,
       messages: [
         {
