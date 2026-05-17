@@ -7,8 +7,9 @@ import { useAuth } from "./AuthProvider";
 import { AuthModal } from "./AuthModal";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { LogOut, BarChart3, User, X } from "lucide-react";
+import { LogOut, BarChart3, User, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTheme } from "next-themes";
 
 function getInitials(name: string) {
   return name
@@ -26,17 +27,22 @@ export function UserMenu() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
 
   const handleSignOut = async () => {
     if (isSigningOut) return;
     setIsSigningOut(true);
+    setDropdownOpen(false);
     try {
       await signOut();
-      setDropdownOpen(false);
-      router.push("/");
-    } finally {
-      setIsSigningOut(false);
+      router.replace("/");
+    } catch {
+      router.replace("/");
     }
+  };
+
+  const handleThemeToggle = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   useEffect(() => {
@@ -105,6 +111,24 @@ export function UserMenu() {
               <User className="size-4" />
               Dashboard
             </Link>
+          </div>
+          <div className="border-t py-1">
+            <button
+              onClick={handleThemeToggle}
+              className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent rounded-md cursor-pointer"
+            >
+              {theme === "dark" ? (
+                <>
+                  <Sun className="size-4" />
+                  Light Mode
+                </>
+              ) : (
+                <>
+                  <Moon className="size-4" />
+                  Dark Mode
+                </>
+              )}
+            </button>
           </div>
           <div className="border-t pt-1">
             <button
