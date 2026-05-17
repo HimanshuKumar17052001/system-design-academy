@@ -30,6 +30,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { useTheme } from "next-themes";
+import { CursorGlow } from "@/components/shared/CursorGlow";
 
 const phases = [
   {
@@ -534,6 +535,9 @@ export default function LandingPage() {
 
       {/* Auth Modal */}
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
+
+      {/* Cursor Glow Effect */}
+      <CursorGlow />
     </div>
   );
 }
