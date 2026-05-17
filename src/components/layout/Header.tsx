@@ -60,7 +60,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
         <Menu className="size-5" />
       </Button>
 
-      <Link href="/" className="flex items-center gap-2">
+      <Link href="/dashboard" className="flex items-center gap-2">
         <BookOpen className="size-5 text-primary" />
         <span className="text-sm font-semibold tracking-tight md:text-base">
           System Design Academy

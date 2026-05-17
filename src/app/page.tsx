@@ -3,349 +3,335 @@
 import Link from "next/link";
 import {
   BookOpen,
-  Globe,
-  Server,
+  ArrowRight,
+  CheckCircle,
   Layers,
+  Server,
+  Globe,
   ShieldCheck,
-  Boxes,
   Sparkles,
   MessageSquareCode,
-  Rocket,
-  ArrowRight,
-  Clock,
+  Boxes,
   Target,
   TrendingUp,
-  type LucideIcon,
+  Zap,
+  Award,
+  Users,
+  BarChart3,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { useProgressStore } from "@/lib/progress";
-import { modules } from "@/data/curriculum";
-import type { ModuleCategory } from "@/types/curriculum";
-import { AppShell } from "@/components/layout/AppShell";
 
-const categoryMeta: Record<
-  ModuleCategory,
-  { label: string; icon: LucideIcon; gradient: string }
-> = {
-  foundations: {
-    label: "Foundations",
+const phases = [
+  {
+    number: "01",
+    title: "Foundations",
+    modules: 7,
     icon: BookOpen,
-    gradient: "from-blue-500/10 to-indigo-500/10",
+    description: "HTTP, DNS, CDN, APIs, Databases, Scaling, Estimation",
   },
-  lld: {
-    label: "Low-Level Design",
+  {
+    number: "02",
+    title: "Low-Level Design",
+    modules: 8,
     icon: Layers,
-    gradient: "from-emerald-500/10 to-teal-500/10",
+    description: "OOP, SOLID, Design Patterns, UML, Case Studies",
   },
-  "core-distributed": {
-    label: "Core Distributed Systems",
+  {
+    number: "03",
+    title: "Core Distributed Systems",
+    modules: 9,
     icon: Server,
-    gradient: "from-orange-500/10 to-amber-500/10",
+    description: "Load Balancing, Caching, Messaging, CAP, Consistency",
   },
-  "architecture-patterns": {
-    label: "Architecture Patterns",
+  {
+    number: "04",
+    title: "Architecture Patterns",
+    modules: 7,
     icon: Boxes,
-    gradient: "from-violet-500/10 to-purple-500/10",
+    description: "Microservices, Event-Driven, CQRS, Sagas, Kubernetes",
   },
-  "reliability-ops": {
-    label: "Reliability & Operations",
+  {
+    number: "05",
+    title: "Reliability & Operations",
+    modules: 5,
     icon: ShieldCheck,
-    gradient: "from-rose-500/10 to-pink-500/10",
+    description: "Observability, Deployments, DR, Chaos Engineering",
   },
-  "real-world-systems": {
-    label: "Real-World Systems",
+  {
+    number: "06",
+    title: "Real-World Systems",
+    modules: 8,
     icon: Globe,
-    gradient: "from-cyan-500/10 to-sky-500/10",
+    description: "URL Shortener, Twitter, Uber, YouTube, Search",
   },
-  "expert-topics": {
-    label: "Expert Topics",
+  {
+    number: "07",
+    title: "Expert Topics",
+    modules: 5,
     icon: Sparkles,
-    gradient: "from-fuchsia-500/10 to-pink-500/10",
+    description: "Real-Time, ML Systems, Security, Payments, Global Scale",
   },
-  "interview-prep": {
-    label: "Interview Prep",
+  {
+    number: "08",
+    title: "Interview Prep",
+    modules: 4,
     icon: MessageSquareCode,
-    gradient: "from-lime-500/10 to-green-500/10",
+    description: "Framework, Mock Interviews, Pitfalls, Cheat Sheets",
   },
-};
+];
 
-function CircularProgress({
-  value,
-  size = 160,
-  strokeWidth = 12,
-}: {
-  value: number;
-  size?: number;
-  strokeWidth?: number;
-}) {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (value / 100) * circumference;
+const features = [
+  {
+    icon: Zap,
+    title: "Interactive Simulations",
+    description: "25 hands-on labs — from load balancers to chaos engineering",
+  },
+  {
+    icon: Target,
+    title: "4 Question Types",
+    description: "Multiple choice, drag-drop, fill-in-blank, and ordering quizzes",
+  },
+  {
+    icon: BarChart3,
+    title: "Progress Tracking",
+    description: "Track completion, quiz scores, and study time across all modules",
+  },
+  {
+    icon: Award,
+    title: "Certificate on Completion",
+    description: "Get a professional PDF certificate emailed to you upon finishing",
+  },
+  {
+    icon: Users,
+    title: "Built for SDE-1 & SDE-2",
+    description: "Curated content targeting real interview questions and scenarios",
+  },
+  {
+    icon: TrendingUp,
+    title: "Real-World Case Studies",
+    description: "Design URL Shortener, Twitter, Uber, YouTube like real engineers do",
+  },
+];
 
+export default function LandingPage() {
   return (
-    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-90">
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={strokeWidth}
-          className="text-muted/30"
-        />
-        <motion.circle
-          initial={{ strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={strokeWidth}
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          className="text-primary"
-        />
-      </svg>
-      <div className="absolute flex flex-col items-center">
-        <span className="text-3xl font-bold">{Math.round(value)}%</span>
-        <span className="text-xs text-muted-foreground">Complete</span>
-      </div>
-    </div>
-  );
-}
-
-export default function DashboardPage() {
-  const completedModules = useProgressStore((s) => s.completedModules);
-  const lastVisited = useProgressStore((s) => s.lastVisited);
-  const totalStudyTimeMinutes = useProgressStore((s) => s.totalStudyTimeMinutes);
-  const getModuleStatus = useProgressStore((s) => s.getModuleStatus);
-
-  const totalModules = modules.length;
-  const completedCount = completedModules.length;
-  const progressPercent = totalModules > 0 ? (completedCount / totalModules) * 100 : 0;
-
-  const hours = Math.floor(totalStudyTimeMinutes / 60);
-  const minutes = totalStudyTimeMinutes % 60;
-
-  const activeCategories = Object.keys(categoryMeta).filter((cat) =>
-    modules.some((m) => m.category === cat)
-  ) as ModuleCategory[];
-
-  const lastModule = lastVisited ? modules.find((m) => m.id === lastVisited) : null;
-
-  return (
-    <AppShell>
-      <div className="mx-auto max-w-6xl space-y-8">
-        {/* Hero */}
-        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 px-6 py-10 text-white md:px-10 md:py-14">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute -right-10 -top-10 size-64 rounded-full bg-blue-500 blur-3xl" />
-            <div className="absolute -bottom-10 -left-10 size-64 rounded-full bg-indigo-500 blur-3xl" />
-          </div>
-          <div className="relative z-10">
-            <Badge className="mb-3 bg-white/10 text-white hover:bg-white/20">
-              <Rocket className="mr-1 size-3" />
-              Interactive Learning
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden border-b">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5" />
+        <div className="relative mx-auto max-w-6xl px-4 py-24 md:px-6 lg:py-32">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center"
+          >
+            <Badge variant="secondary" className="mb-6 text-sm">
+              53 Modules · 25 Simulations · 100% Free
             </Badge>
-            <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
-              System Design Academy
+            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
+              Master System
+              <br />
+              <span className="text-primary">Design & Architecture</span>
             </h1>
-            <p className="mt-3 max-w-xl text-base text-slate-300 md:text-lg">
-              Master system design with interactive lessons, hands-on labs, and
-              real-world case studies. Build the skills to architect scalable,
-              reliable systems.
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
+              From HTTP fundamentals to designing Uber and Twitter at scale.
+              Interactive lessons, hands-on labs, and real-world case studies for
+              your next system design interview.
             </p>
-            <div className="mt-6">
-              <Link href="/module/sd-fundamentals">
-                <Button size="lg" className="gap-2 bg-white text-slate-900 hover:bg-white/90">
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link href="/dashboard">
+                <Button size="lg" className="gap-2 text-base">
                   Start Learning
                   <ArrowRight className="size-4" />
                 </Button>
               </Link>
+              <a
+                href="https://github.com/HimanshuKumar17052001/system-design-academy"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button size="lg" variant="outline" className="text-base">
+                  View on GitHub
+                </Button>
+              </a>
             </div>
-          </div>
-        </section>
-
-        {/* Stats row */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardContent className="flex items-center gap-4 py-6">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-300">
-                <BookOpen className="size-5" />
+            <div className="mt-8 flex items-center justify-center gap-6 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <CheckCircle className="size-4 text-emerald-500" />
+                <span>Beginner to Advanced</span>
               </div>
-              <div>
-                <div className="text-2xl font-bold">{totalModules}</div>
-                <div className="text-xs text-muted-foreground">Total Modules</div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle className="size-4 text-emerald-500" />
+                <span>Self-Paced</span>
               </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex items-center gap-4 py-6">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-300">
-                <Target className="size-5" />
+              <div className="flex items-center gap-1.5">
+                <CheckCircle className="size-4 text-emerald-500" />
+                <span>Certificate Included</span>
               </div>
-              <div>
-                <div className="text-2xl font-bold">{completedCount}</div>
-                <div className="text-xs text-muted-foreground">Completed</div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex items-center gap-4 py-6">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-300">
-                <Clock className="size-5" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold">
-                  {hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`}
-                </div>
-                <div className="text-xs text-muted-foreground">Study Time</div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex items-center gap-4 py-6">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-300">
-                <TrendingUp className="size-5" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold">
-                  {Math.round(progressPercent)}%
-                </div>
-                <div className="text-xs text-muted-foreground">Progress</div>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </motion.div>
         </div>
+      </section>
 
-        {/* Main content grid */}
-        <div className="grid gap-8 lg:grid-cols-3">
-          {/* Category cards */}
-          <div className="lg:col-span-2 space-y-4">
-            <h2 className="text-lg font-semibold tracking-tight">Categories</h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {activeCategories.map((cat) => {
-                const meta = categoryMeta[cat];
-                const catModules = modules.filter((m) => m.category === cat);
-                const catCompleted = catModules.filter((m) =>
-                  completedModules.includes(m.id)
-                ).length;
-                const catPercent =
-                  catModules.length > 0
-                    ? (catCompleted / catModules.length) * 100
-                    : 0;
-                const Icon = meta.icon;
-
-                return (
-                  <motion.div
-                    key={cat}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Card className="overflow-hidden">
-                      <div
-                        className={`h-1.5 w-full bg-gradient-to-r ${meta.gradient}`}
-                      />
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center gap-2">
-                          <div className="flex size-8 items-center justify-center rounded-md bg-muted">
-                            <Icon className="size-4 text-muted-foreground" />
-                          </div>
-                          <CardTitle className="text-sm font-medium">
-                            {meta.label}
-                          </CardTitle>
-                        </div>
-                        <CardDescription className="text-xs">
-                          {catModules.length} modules
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        <div className="flex items-center justify-between text-xs text-muted-foreground">
-                          <span>
-                            {catCompleted}/{catModules.length} completed
-                          </span>
-                          <span>{Math.round(catPercent)}%</span>
-                        </div>
-                        <Progress value={catPercent} className="h-1.5" />
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Right column: progress + activity */}
-          <div className="space-y-6">
-            {/* Overall progress ring */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm font-medium">Overall Progress</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col items-center gap-4">
-                <CircularProgress value={progressPercent} />
-                <div className="text-center text-sm text-muted-foreground">
-                  {completedCount} of {totalModules} modules completed
+      {/* Stats */}
+      <section className="border-b py-12">
+        <div className="mx-auto max-w-6xl px-4 md:px-6">
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+            {[
+              { value: "53", label: "Modules" },
+              { value: "25", label: "Simulations" },
+              { value: "200+", label: "Quiz Questions" },
+              { value: "8", label: "Phases" },
+            ].map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="text-center"
+              >
+                <div className="text-3xl font-bold text-foreground md:text-4xl">
+                  {stat.value}
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Recent activity */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm font-medium">Recent Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {lastModule ? (
-                  <div className="space-y-3">
-                    <div className="text-xs text-muted-foreground">
-                      Last visited
-                    </div>
-                    <Link
-                      href={`/module/${lastModule.id}`}
-                      className="flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-accent"
-                    >
-                      <div className="flex size-8 items-center justify-center rounded-md bg-muted">
-                        <BookOpen className="size-4 text-muted-foreground" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate">
-                          {lastModule.title}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          Module {lastModule.number}
-                        </div>
-                      </div>
-                      <ArrowRight className="size-4 text-muted-foreground" />
-                    </Link>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Badge
-                        variant="outline"
-                        className="text-[10px] h-4 px-1 py-0"
-                      >
-                        {getModuleStatus(lastModule.id)}
-                      </Badge>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground">
-                    No recent activity. Start with Module 1 to begin your
-                    journey.
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                <div className="mt-1 text-sm text-muted-foreground">
+                  {stat.label}
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
-      </div>
-    </AppShell>
+      </section>
+
+      {/* Curriculum Phases */}
+      <section className="py-20">
+        <div className="mx-auto max-w-6xl px-4 md:px-6">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+              Complete Curriculum
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              8 phases covering everything from basics to expert-level system design
+            </p>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {phases.map((phase, i) => {
+              const Icon = phase.icon;
+              return (
+                <motion.div
+                  key={phase.number}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className="group rounded-xl border bg-card p-6 transition-colors hover:border-primary/50"
+                >
+                  <div className="mb-4 flex items-center justify-between">
+                    <div className="rounded-lg bg-primary/10 p-2">
+                      <Icon className="size-5 text-primary" />
+                    </div>
+                    <span className="text-xs font-medium text-muted-foreground">
+                      {phase.number}
+                    </span>
+                  </div>
+                  <h3 className="font-semibold">{phase.title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {phase.modules} modules
+                  </p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {phase.description}
+                  </p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="border-y bg-muted/40 py-20">
+        <div className="mx-auto max-w-6xl px-4 md:px-6">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+              Why This Platform?
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              Designed for engineers who want to ace system design interviews
+            </p>
+          </div>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((feature, i) => {
+              const Icon = feature.icon;
+              return (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="flex flex-col gap-3"
+                >
+                  <div className="w-fit rounded-lg bg-primary/10 p-2.5">
+                    <Icon className="size-5 text-primary" />
+                  </div>
+                  <h3 className="font-semibold">{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {feature.description}
+                  </p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20">
+        <div className="mx-auto max-w-4xl px-4 text-center md:px-6">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+              Ready to Master System Design?
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
+              Start with Module 1 and work your way through 53 interactive modules.
+              Your certificate awaits at the finish line.
+            </p>
+            <div className="mt-8">
+              <Link href="/dashboard">
+                <Button size="lg" className="gap-2 text-base">
+                  Start Learning Now
+                  <ArrowRight className="size-4" />
+                </Button>
+              </Link>
+            </div>
+            <p className="mt-4 text-xs text-muted-foreground">
+              Free forever. No credit card required.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t py-8">
+        <div className="mx-auto max-w-6xl px-4 text-center text-sm text-muted-foreground md:px-6">
+          <p>
+            Built with Next.js, Supabase, and shadcn/ui. Open source on{" "}
+            <a
+              href="https://github.com/HimanshuKumar17052001/system-design-academy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              GitHub
+            </a>
+            .
+          </p>
+        </div>
+      </footer>
+    </div>
   );
 }
