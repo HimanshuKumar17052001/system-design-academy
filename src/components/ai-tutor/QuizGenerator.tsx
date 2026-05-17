@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { FileQuestion, X, Sparkles, Loader2, RefreshCw } from "lucide-react";
+import { FileQuestion, X, Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { generateQuiz } from "@/lib/groq";
 
 interface QuizGeneratorProps {
@@ -25,7 +24,7 @@ export function QuizGenerator({ moduleTitle }: QuizGeneratorProps) {
       const result = await generateQuiz(moduleTitle, 5);
       setQuiz(result);
     } catch (err) {
-      setError("Failed to generate quiz. Please try again.");
+      setError("Failed to generate. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -33,15 +32,15 @@ export function QuizGenerator({ moduleTitle }: QuizGeneratorProps) {
 
   return (
     <>
-      {/* Trigger Button */}
+      {/* Minimal Trigger Button */}
       <Button
         variant="outline"
         size="sm"
         onClick={() => setIsOpen(true)}
-        className="gap-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50 hover:border-indigo-300 dark:border-indigo-800 dark:text-indigo-300 dark:hover:bg-indigo-950"
+        className="gap-1.5 text-xs h-8"
       >
-        <Sparkles className="size-4" />
-        AI Quiz Generator
+        <FileQuestion className="size-3.5" />
+        Quiz
       </Button>
 
       {/* Modal */}
@@ -52,97 +51,64 @@ export function QuizGenerator({ moduleTitle }: QuizGeneratorProps) {
             onClick={() => setIsOpen(false)}
           />
 
-          <div className="relative w-full max-w-2xl max-h-[80vh] overflow-hidden rounded-xl border bg-popup shadow-2xl animate-in fade-in zoom-in-95 flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600">
-              <div className="flex items-center gap-2 text-white">
-                <FileQuestion className="size-5" />
-                <h3 className="font-semibold">AI Quiz Generator</h3>
+          <div className="relative w-full max-w-xl max-h-[70vh] overflow-hidden rounded-lg border bg-popup shadow-xl flex flex-col">
+            {/* Minimal Header */}
+            <div className="flex items-center justify-between border-b px-3 py-2">
+              <div className="flex items-center gap-2">
+                <FileQuestion className="size-4 text-muted-foreground" />
+                <span className="text-sm font-medium">AI Quiz</span>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-white/80 hover:text-white"
+                className="text-muted-foreground hover:text-foreground"
               >
-                <X className="size-5" />
+                <X className="size-4" />
               </button>
             </div>
 
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-4">
               {!quiz && !isLoading && (
-                <div className="text-center py-8">
-                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900">
-                    <Sparkles className="size-8 text-indigo-600 dark:text-indigo-400" />
-                  </div>
-                  <h4 className="text-lg font-semibold mb-2">
-                    Generate Custom Quiz
-                  </h4>
+                <div className="text-center py-6">
                   <p className="text-sm text-muted-foreground mb-4">
-                    I&apos;ll generate 5 interview-style questions about{" "}
-                    <span className="font-medium text-foreground">
-                      {moduleTitle}
-                    </span>
+                    Generate 5 questions on <span className="font-medium">{moduleTitle}</span>
                   </p>
-                  <Button
-                    onClick={handleGenerate}
-                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-                  >
-                    <Sparkles className="size-4 mr-2" />
-                    Generate Quiz
+                  <Button size="sm" onClick={handleGenerate} variant="outline">
+                    Generate
                   </Button>
                 </div>
               )}
 
               {isLoading && (
-                <div className="text-center py-12">
-                  <Loader2 className="size-8 animate-spin text-indigo-600 mx-auto mb-4" />
-                  <p className="text-muted-foreground">
-                    Generating questions...
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Creating 5 interview-style questions
-                  </p>
+                <div className="text-center py-6">
+                  <Loader2 className="size-5 animate-spin text-muted-foreground mx-auto mb-2" />
+                  <p className="text-xs text-muted-foreground">Generating...</p>
                 </div>
               )}
 
               {error && (
-                <div className="text-center py-8">
-                  <p className="text-destructive mb-4">{error}</p>
-                  <Button variant="outline" onClick={handleGenerate}>
-                    <RefreshCw className="size-4 mr-2" />
-                    Try Again
+                <div className="text-center py-6">
+                  <p className="text-xs text-destructive mb-2">{error}</p>
+                  <Button size="sm" onClick={handleGenerate} variant="outline">
+                    <RefreshCw className="size-3 mr-1" />
+                    Retry
                   </Button>
                 </div>
               )}
 
               {quiz && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm text-muted-foreground">
-                      Generated 5 questions for {moduleTitle}
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleGenerate}
-                      disabled={isLoading}
-                    >
+                <div className="space-y-3">
+                  <div className="flex justify-end">
+                    <Button size="sm" variant="outline" onClick={handleGenerate} disabled={isLoading}>
                       <RefreshCw className="size-3 mr-1" />
-                      Regenerate
+                      New
                     </Button>
                   </div>
-                  <div className="whitespace-pre-wrap text-sm leading-relaxed font-mono bg-muted/50 p-4 rounded-lg">
+                  <pre className="text-xs leading-relaxed whitespace-pre-wrap font-mono bg-muted p-3 rounded">
                     {quiz}
-                  </div>
+                  </pre>
                 </div>
               )}
-            </div>
-
-            {/* Footer */}
-            <div className="border-t px-4 py-2 text-center">
-              <p className="text-[10px] text-muted-foreground">
-                AI can make mistakes. Verify important information.
-              </p>
             </div>
           </div>
         </div>

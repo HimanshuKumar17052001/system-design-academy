@@ -192,6 +192,11 @@ const features = [
     title: "Real-World Case Studies",
     description: "Design URL Shortener, Twitter, Uber, YouTube like real engineers do",
   },
+  {
+    icon: Sparkles,
+    title: "AI Learning Assistant",
+    description: "Get instant help, generate quizzes, and clarify concepts while you learn",
+  },
 ];
 
 function PhaseCard({ phase, index }: { phase: typeof phases[0]; index: number }) {

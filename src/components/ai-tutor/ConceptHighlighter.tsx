@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { Sparkles, X, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { explainConcept } from "@/lib/groq";
 
 export function ConceptHighlighter() {
@@ -49,7 +48,7 @@ export function ConceptHighlighter() {
       const result = await explainConcept(selectedText);
       setExplanation(result);
     } catch (error) {
-      setExplanation("Sorry, I couldn't explain this concept. Please try again.");
+      setExplanation("Sorry, couldn't explain. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -57,65 +56,49 @@ export function ConceptHighlighter() {
 
   return (
     <>
-      {/* Floating Tooltip */}
+      {/* Minimal Tooltip */}
       {showTooltip && (
         <button
           onClick={handleExplain}
-          className="fixed z-50 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 px-3 py-1.5 text-xs font-medium text-white shadow-lg hover:scale-105 transition-transform"
+          className="fixed z-50 flex items-center gap-1 rounded-full border bg-background px-2.5 py-1 text-xs shadow-sm hover:bg-muted transition-colors"
           style={{
             left: position.x,
             top: position.y,
             transform: "translate(-50%, -100%)",
           }}
         >
-          <Sparkles className="size-3" />
-          Explain
+          <Sparkles className="size-3 text-muted-foreground" />
+          <span className="text-muted-foreground">Explain</span>
         </button>
       )}
 
-      {/* Explanation Popup */}
+      {/* Minimal Popup */}
       {showPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="fixed inset-0 bg-background/80 backdrop-blur-sm"
             onClick={() => setShowPopup(false)}
           />
-          <div className="relative w-full max-w-md rounded-xl border bg-popover p-4 shadow-2xl animate-in fade-in zoom-in-95">
+          <div className="relative w-full max-w-sm rounded-lg border bg-popup p-3 shadow-lg">
             <button
               onClick={() => setShowPopup(false)}
-              className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+              className="absolute right-2 top-2 text-muted-foreground hover:text-foreground"
             >
-              <X className="size-4" />
+              <X className="size-3.5" />
             </button>
 
-            <div className="flex items-center gap-2 mb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-500">
-                <Sparkles className="size-4 text-white" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-sm">AI Explanation</h4>
-                <p className="text-[10px] text-muted-foreground">Selected concept</p>
-              </div>
-            </div>
-
-            <div className="rounded-lg bg-muted/50 p-3 mb-3">
-              <p className="text-sm text-muted-foreground line-clamp-3">
-                "{selectedText}"
-              </p>
-            </div>
+            <p className="text-xs text-muted-foreground line-clamp-2 mb-2 pr-5">
+              "{selectedText}"
+            </p>
 
             {isLoading ? (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Loader2 className="size-4 animate-spin" />
-                <span className="text-sm">Thinking...</span>
+              <div className="flex items-center gap-1.5 text-muted-foreground">
+                <Loader2 className="size-3 animate-spin" />
+                <span className="text-xs">Thinking...</span>
               </div>
             ) : (
-              <p className="text-sm leading-relaxed">{explanation}</p>
+              <p className="text-sm">{explanation}</p>
             )}
-
-            <p className="mt-3 text-[10px] text-muted-foreground text-center">
-              AI can make mistakes. Verify important information.
-            </p>
           </div>
         </div>
       )}
