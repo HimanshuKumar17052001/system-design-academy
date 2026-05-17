@@ -181,7 +181,6 @@ export function QuizGenerator({ moduleTitle }: QuizGeneratorProps) {
                             bgClass
                           )}
                         >
-                          <span className="font-medium mr-2">{optLetter})</span>
                           {option}
                         </button>
                       );
