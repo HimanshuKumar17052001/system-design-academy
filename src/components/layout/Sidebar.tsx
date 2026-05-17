@@ -131,7 +131,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
     <>
       {/* Desktop Collapsible Sidebar */}
       <div
-        className="hidden md:flex md:flex-col md:border-r md:bg-card relative transition-all duration-300 ease-in-out"
+        className="hidden md:flex md:flex-col md:border-r md:bg-card relative transition-all duration-300 ease-in-out h-full"
         style={{ width: expanded ? 280 : 72 }}
         onMouseEnter={() => setExpanded(true)}
         onMouseLeave={() => setExpanded(false)}
@@ -182,7 +182,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
           )}
         </div>
 
-        <ScrollArea className="flex-1">
+        <ScrollArea className="flex-1 h-0">
           <div className={cn("py-2", expanded ? "px-3" : "px-2")}>
             {activeCategories.map((cat, catIndex) => {
               const catModules = grouped[cat];
