@@ -4,7 +4,13 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-const MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+const MODEL = process.env.GROQ_MODEL;
+
+if (!MODEL) {
+  throw new Error("GROQ_MODEL environment variable is not set");
+}
+
+const model: string = MODEL;
 
 const SYSTEM_PROMPT = `You are an expert System Design tutor. Your role is to help users learn system design concepts clearly and effectively.
 
@@ -34,7 +40,7 @@ export async function getAIResponse(
     ];
 
     const completion = await groq.chat.completions.create({
-      model: MODEL,
+      model: model,
       messages: chatMessages,
       temperature: 0.7,
       max_tokens: 1024,
@@ -53,7 +59,7 @@ export async function explainConcept(
 ): Promise<string> {
   try {
     const completion = await groq.chat.completions.create({
-      model: MODEL,
+      model: model,
       messages: [
         {
           role: "system",
@@ -78,7 +84,7 @@ export async function generateQuiz(
 ): Promise<string> {
   try {
     const completion = await groq.chat.completions.create({
-      model: MODEL,
+      model: model,
       messages: [
         {
           role: "system",
