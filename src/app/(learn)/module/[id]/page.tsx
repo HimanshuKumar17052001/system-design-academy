@@ -8,6 +8,7 @@ import { ModuleTabs } from "@/components/learn/ModuleTabs";
 import { ModuleLockGate } from "@/components/learn/ModuleLockGate";
 import { ModuleNotesDownloader } from "@/components/learn/ModuleNotesDownloader";
 import { AITutor } from "@/components/ai-tutor/AITutor";
+import { ConceptHighlighter } from "@/components/ai-tutor/ConceptHighlighter";
 import { Suspense } from "react";
 
 interface ModulePageProps {
@@ -81,6 +82,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
       </ModuleLockGate>
 
       <AITutor moduleTitle={module.title} moduleContent={module.lessons?.map(l => l.content.map(c => c.type === 'text' ? c.content : '').join(' ')).join(' ') || ''} />
+      <ConceptHighlighter />
     </div>
   );
 }
