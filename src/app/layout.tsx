@@ -22,6 +22,11 @@ export const metadata: Metadata = {
     "distributed systems",
     "interview prep",
   ],
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/apple-touch-icon.svg",
+    shortcut: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
