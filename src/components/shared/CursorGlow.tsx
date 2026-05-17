@@ -54,41 +54,14 @@ export function CursorGlow() {
   if (isMobile) return null;
 
   return (
-    <>
-      {/* Main glow */}
-      <div
-        className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden hidden md:block"
-        style={{
-          background: isVisible
-            ? `radial-gradient(600px circle at ${position.x}px ${position.y}px, rgba(99, 102, 241, 0.12), transparent 40%)`
-            : "transparent",
-          transition: "background 0.15s ease-out",
-        }}
-      />
-      {/* Matrix-style trailing dots - desktop only */}
-      <div
-        className="pointer-events-none fixed z-[9998] hidden md:block"
-        style={{
-          left: position.x - 6,
-          top: position.y - 6,
-          transition: "left 0.12s ease-out, top 0.12s ease-out",
-        }}
-      >
-        <div className="flex gap-1.5">
-          {[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className="rounded-full bg-primary/50"
-              style={{
-                width: 12 - i * 3,
-                height: 12 - i * 3,
-                opacity: 0.8 - i * 0.25,
-                transform: `scale(${1 - i * 0.15})`,
-              }}
-            />
-          ))}
-        </div>
-      </div>
-    </>
+    <div
+      className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden hidden md:block"
+      style={{
+        background: isVisible
+          ? `radial-gradient(600px circle at ${position.x}px ${position.y}px, rgba(99, 102, 241, 0.12), transparent 40%)`
+          : "transparent",
+        transition: "background 0.15s ease-out",
+      }}
+    />
   );
 }
