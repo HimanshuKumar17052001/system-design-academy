@@ -145,27 +145,27 @@ export default function DashboardPage() {
     <AppShell>
       <div className="mx-auto max-w-6xl space-y-8">
         {/* Hero */}
-        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 px-6 py-10 md:px-10 md:py-14">
-          <div className="absolute inset-0 opacity-10">
+        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 dark:from-primary/30 dark:to-secondary/30 px-6 py-10 md:px-10 md:py-14">
+          <div className="absolute inset-0 opacity-10 dark:opacity-15">
             <div className="absolute -right-10 -top-10 size-64 rounded-full bg-blue-500 blur-3xl" />
             <div className="absolute -bottom-10 -left-10 size-64 rounded-full bg-indigo-500 blur-3xl" />
           </div>
           <div className="relative z-10">
-            <Badge className="mb-3 bg-white/10 text-white hover:bg-white/20">
+            <Badge className="mb-3 bg-primary/20 text-foreground hover:bg-primary/30">
               <Rocket className="mr-1 size-3" />
               Interactive Learning
             </Badge>
             <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
               System Design Academy
             </h1>
-            <p className="mt-3 max-w-xl text-base text-slate-300 md:text-lg">
+            <p className="mt-3 max-w-xl text-base text-muted-foreground md:text-lg">
               Master system design with interactive lessons, hands-on labs, and
               real-world case studies. Build the skills to architect scalable,
               reliable systems.
             </p>
             <div className="mt-6">
               <Link href="/module/sd-fundamentals">
-                <Button size="lg" className="gap-2 bg-white text-slate-900 hover:bg-white/90">
+                <Button size="lg" className="gap-2">
                   Start Learning
                   <ArrowRight className="size-4" />
                 </Button>
@@ -178,7 +178,7 @@ export default function DashboardPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardContent className="flex items-center gap-4 py-6">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-300">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
                 <BookOpen className="size-5" />
               </div>
               <div>
@@ -189,7 +189,7 @@ export default function DashboardPage() {
           </Card>
           <Card>
             <CardContent className="flex items-center gap-4 py-6">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-300">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                 <Target className="size-5" />
               </div>
               <div>
@@ -200,7 +200,7 @@ export default function DashboardPage() {
           </Card>
           <Card>
             <CardContent className="flex items-center gap-4 py-6">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-300">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
                 <Clock className="size-5" />
               </div>
               <div>
@@ -213,7 +213,7 @@ export default function DashboardPage() {
           </Card>
           <Card>
             <CardContent className="flex items-center gap-4 py-6">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-300">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600 dark:text-violet-400">
                 <TrendingUp className="size-5" />
               </div>
               <div>
