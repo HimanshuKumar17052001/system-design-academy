@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +40,7 @@ export function AuthModal({ open: controlledOpen, onOpenChange }: AuthModalProps
   };
 
   const { signUp, signIn, signInWithGoogle } = useAuth();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"signin" | "signup">("signin");
   const [googleLoading, setGoogleLoading] = useState(false);
 
@@ -66,6 +68,7 @@ export function AuthModal({ open: controlledOpen, onOpenChange }: AuthModalProps
       handleOpenChange(false);
       setSignInEmail("");
       setSignInPassword("");
+      router.push("/dashboard");
     }
 
     setSignInLoading(false);
@@ -92,6 +95,7 @@ export function AuthModal({ open: controlledOpen, onOpenChange }: AuthModalProps
       setSignUpConfirmPassword("");
       setSignUpFullName("");
       setActiveTab("signin");
+      router.push("/dashboard");
     }
 
     setSignUpLoading(false);

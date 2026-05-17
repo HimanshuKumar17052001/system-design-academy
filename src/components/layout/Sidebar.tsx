@@ -112,7 +112,13 @@ interface SidebarProps {
 export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const getModuleStatus = useProgressStore((s) => s.getModuleStatus);
   const [expanded, setExpanded] = useState(false);
-  const [expandedCats, setExpandedCats] = useState<Record<string, boolean>>({});
+  const [expandedCats, setExpandedCats] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    categoryOrder.forEach((cat) => {
+      initial[cat] = true;
+    });
+    return initial;
+  });
 
   const grouped = categoryOrder.reduce<Record<string, Module[]>>((acc, cat) => {
     acc[cat] = modules.filter((m) => m.category === cat);
@@ -194,12 +200,12 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                   {expanded ? (
                     <button
                       onClick={() => toggleCat(cat)}
-                      className="flex items-center justify-between w-full px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+                      className="flex items-center justify-between w-full px-2 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-md transition-colors cursor-pointer"
                     >
                       <span>{categoryLabels[cat]}</span>
                       <ChevronRight
                         className={cn(
-                          "size-3 transition-transform",
+                          "size-3 transition-transform shrink-0",
                           isCatExpanded && "rotate-90"
                         )}
                       />

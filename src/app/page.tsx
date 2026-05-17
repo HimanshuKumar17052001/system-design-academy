@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   BookOpen,
   ArrowRight,
@@ -311,7 +312,14 @@ function ThemeToggle() {
 
 export default function LandingPage() {
   const { isAuthenticated } = useAuth();
+  const router = useRouter();
   const [authOpen, setAuthOpen] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace("/dashboard");
+    }
+  }, [isAuthenticated, router]);
 
   const handleStartLearning = () => {
     if (!isAuthenticated) {
