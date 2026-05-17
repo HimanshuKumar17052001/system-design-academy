@@ -194,82 +194,70 @@ const features = [
 
 function PhaseCard({ phase, index }: { phase: typeof phases[0]; index: number }) {
   const [flipped, setFlipped] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const Icon = phase.icon;
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className="relative h-64 cursor-pointer"
+      className="group relative aspect-[4/3] min-h-[220px] sm:min-h-[260px] cursor-pointer"
       style={{ perspective: "1000px" }}
-      onClick={() => setFlipped(!flipped)}
+      onClick={() => isMobile && setFlipped(!flipped)}
+      onMouseEnter={() => !isMobile && setFlipped(true)}
+      onMouseLeave={() => !isMobile && setFlipped(false)}
     >
       <motion.div
         className="relative h-full w-full"
         style={{ transformStyle: "preserve-3d" }}
         animate={{ rotateY: flipped ? 180 : 0 }}
-        transition={{ duration: 0.6, type: "spring", stiffness: 260, damping: 20 }}
+        transition={{ duration: 0.5, type: "spring", stiffness: 260, damping: 20 }}
       >
         {/* Front */}
         <div
-          className="absolute inset-0 rounded-xl border bg-card p-6 transition-colors hover:border-primary/50"
+          className="absolute inset-0 rounded-xl border bg-card p-4 sm:p-5 transition-colors group-hover:border-primary/50 flex flex-col"
           style={{ backfaceVisibility: "hidden" }}
         >
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between shrink-0">
             <div className="rounded-lg bg-primary/10 p-2">
-              <Icon className="size-5 text-primary" />
+              <Icon className="size-4 sm:size-5 text-primary" />
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-muted-foreground">
-                {phase.number}
-              </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="size-7"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setFlipped(true);
-                }}
-              >
-                <Info className="size-4 text-muted-foreground hover:text-primary" />
-              </Button>
-            </div>
+            <span className="text-xs font-medium text-muted-foreground">
+              {phase.number}
+            </span>
           </div>
-          <h3 className="mt-4 font-semibold">{phase.title}</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {phase.modules} modules
-          </p>
-          <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-            {phase.description}
-          </p>
+          <div className="mt-auto pt-3">
+            <h3 className="font-semibold text-sm sm:text-base">{phase.title}</h3>
+            <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
+              {phase.modules} modules
+            </p>
+            <p className="mt-1.5 text-[10px] sm:text-xs text-muted-foreground leading-relaxed line-clamp-3">
+              {phase.description}
+            </p>
+          </div>
         </div>
 
         {/* Back */}
         <div
-          className="absolute inset-0 rounded-xl border bg-primary/5 p-6"
+          className="absolute inset-0 rounded-xl border bg-primary/5 p-4 sm:p-5 flex flex-col overflow-hidden"
           style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
         >
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-sm">{phase.title} Topics</h3>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-6"
-              onClick={(e) => {
-                e.stopPropagation();
-                setFlipped(false);
-              }}
-            >
-              <X className="size-4" />
-            </Button>
-          </div>
-          <ul className="space-y-1.5">
+          <h3 className="font-semibold text-xs sm:text-sm shrink-0 mb-2 pb-2 border-b border-primary/10">
+            {phase.title} Topics
+          </h3>
+          <ul className="flex-1 overflow-y-auto space-y-1.5 pr-1 scrollbar-thin">
             {phase.topics.map((topic, i) => (
-              <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-                <CheckCircle className="size-3 mt-0.5 shrink-0 text-primary/70" />
-                <span>{topic}</span>
+              <li key={i} className="flex items-start gap-2 text-[10px] sm:text-xs text-muted-foreground">
+                <CheckCircle className="size-2.5 sm:size-3 mt-0.5 shrink-0 text-primary/70" />
+                <span className="leading-snug">{topic}</span>
               </li>
             ))}
           </ul>
@@ -421,11 +409,14 @@ export default function LandingPage() {
             <p className="mt-4 text-muted-foreground">
               8 phases covering everything from basics to expert-level system design
             </p>
-            <p className="mt-2 text-xs text-muted-foreground">
-              Click the <Info className="inline size-3" /> icon on any card to see topics
+            <p className="mt-2 text-xs text-muted-foreground hidden sm:block">
+              Hover over any card to see topics
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground sm:hidden">
+              Tap any card to see topics
             </p>
           </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {phases.map((phase, i) => (
               <PhaseCard key={phase.number} phase={phase} index={i} />
             ))}
