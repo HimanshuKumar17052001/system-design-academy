@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import type { QuizAnswer } from "./QuizEngine";
 
 interface MultipleChoiceQuestionProps {
@@ -31,22 +31,35 @@ export default function MultipleChoiceQuestion({
   reviewMode,
 }: MultipleChoiceQuestionProps) {
   const [selected, setSelected] = useState<number | undefined>(answer?.selectedIndex);
+  const [attempts, setAttempts] = useState(0);
+  const [showHint, setShowHint] = useState(false);
   const [showExplanation, setShowExplanation] = useState(checked || reviewMode);
 
   useEffect(() => {
     setSelected(answer?.selectedIndex);
     setShowExplanation(checked || reviewMode);
+    setAttempts(checked ? 1 : 0);
   }, [answer, checked, reviewMode]);
 
   const handleSelect = (index: number) => {
-    if (checked && !reviewMode) return;
+    if (showExplanation && !reviewMode) return;
+    const newAttempts = attempts + 1;
+    setAttempts(newAttempts);
     setSelected(index);
     onAnswer({ type: "multiple-choice", selectedIndex: index });
-    setShowExplanation(true);
-    onCheck();
+
+    if (newAttempts >= 3 || index === question.correctIndex) {
+      setShowExplanation(true);
+      setShowHint(false);
+      onCheck();
+    } else {
+      setShowHint(true);
+      setShowExplanation(false);
+    }
   };
 
   const isCorrect = selected === question.correctIndex;
+  const shouldRevealAnswer = showExplanation && (attempts >= 3 || reviewMode);
 
   return (
     <div className="space-y-4" role="radiogroup" aria-label="Multiple choice options">
@@ -56,7 +69,7 @@ export default function MultipleChoiceQuestion({
         {question.options.map((option, idx) => {
           const isSelected = selected === idx;
           const isCorrectOption = idx === question.correctIndex;
-          const showCorrectness = showExplanation || reviewMode;
+          const showCorrectness = shouldRevealAnswer;
 
           let variant: "default" | "outline" | "secondary" | "destructive" = "outline";
           if (showCorrectness) {
@@ -69,7 +82,7 @@ export default function MultipleChoiceQuestion({
           return (
             <motion.div
               key={idx}
-              whileTap={!showCorrectness && !reviewMode ? { scale: 0.98 } : undefined}
+              whileTap={!shouldRevealAnswer && !reviewMode ? { scale: 0.98 } : undefined}
             >
               <Button
                 variant={variant}
@@ -84,7 +97,7 @@ export default function MultipleChoiceQuestion({
                 role="radio"
                 aria-checked={isSelected}
                 aria-label={option}
-                disabled={showCorrectness && !reviewMode}
+                disabled={shouldRevealAnswer && !reviewMode}
               >
                 <span className="mr-3 font-mono text-sm opacity-60">
                   {String.fromCharCode(65 + idx)}.
@@ -101,6 +114,20 @@ export default function MultipleChoiceQuestion({
           );
         })}
       </div>
+
+      {showHint && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          className="flex items-start gap-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 rounded-lg p-3"
+        >
+          <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+          <div>
+            <span className="font-medium">Incorrect ({attempts}/3)</span>
+            <span className="ml-2">Try again! {3 - attempts} attempts remaining.</span>
+          </div>
+        </motion.div>
+      )}
 
       {showExplanation && (
         <motion.div

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getAIResponse, type ChatMessage } from "@/lib/groq";
 import { useAITutor } from "./AITutorContext";
+import ReactMarkdown from "react-markdown";
 
 interface AITutorProps {
   moduleTitle?: string;
@@ -169,7 +170,13 @@ export function AITutor({ moduleTitle, moduleContent }: AITutorProps) {
                           : "bg-muted"
                       )}
                     >
-                      {msg.content}
+                      {msg.role === "assistant" ? (
+                        <ReactMarkdown className="prose prose-xs prose-invert max-w-none">
+                          {msg.content}
+                        </ReactMarkdown>
+                      ) : (
+                        msg.content
+                      )}
                     </div>
                   </div>
                 ))}
