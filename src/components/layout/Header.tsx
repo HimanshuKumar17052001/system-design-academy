@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Menu,
   RotateCcw,
@@ -32,6 +33,7 @@ interface HeaderProps {
 
 export function Header({ onMenuToggle }: HeaderProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const router = useRouter();
   const completedModules = useProgressStore((s) => s.completedModules);
   const totalStudyTimeMinutes = useProgressStore(
     (s) => s.totalStudyTimeMinutes
@@ -49,6 +51,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
   const handleReset = () => {
     resetProgress();
     setDialogOpen(false);
+    router.push("/dashboard");
   };
 
   return (

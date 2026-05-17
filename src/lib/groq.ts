@@ -3,22 +3,30 @@ import { Groq } from "groq-sdk";
 let groqClient: Groq | null = null;
 
 function getGroqClient(): Groq {
-  if (!groqClient) {
-    const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey) {
-      throw new Error("GROQ_API_KEY environment variable is not set");
-    }
-    groqClient = new Groq({ apiKey });
+  if (groqClient) return groqClient;
+  
+  const apiKey = process.env.GROQ_API_KEY;
+  
+  if (!apiKey || apiKey.trim() === "") {
+    console.error("GROQ_API_KEY is not set. Please add it in Vercel Environment Variables.");
+    throw new Error("GROQ_API_KEY environment variable is not set. Please configure it in Vercel.");
   }
+  
+  groqClient = new Groq({ apiKey: apiKey.trim() });
   return groqClient;
 }
 
 function getModel(): string {
   const model = process.env.GROQ_MODEL;
-  if (!model) {
-    throw new Error("GROQ_MODEL environment variable is not set");
+  if (!model || model.trim() === "") {
+    console.error("GROQ_MODEL is not set. Please add it in Vercel Environment Variables.");
+    throw new Error("GROQ_MODEL environment variable is not set. Please configure it in Vercel.");
   }
-  return model;
+  const trimmedModel = model.trim();
+  if (!trimmedModel) {
+    throw new Error("GROQ_MODEL environment variable is empty");
+  }
+  return trimmedModel;
 }
 
 const SYSTEM_PROMPT = `You are an expert System Design tutor. Your role is to help users learn system design concepts clearly and effectively.

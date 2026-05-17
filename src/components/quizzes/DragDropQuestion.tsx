@@ -151,9 +151,22 @@ export default function DragDropQuestion({
 
     if (!leftItems.includes(leftItem) || !rightItems.includes(rightItem)) return;
 
-    const newMatches = { ...matches, [leftItem]: rightItem };
+    const newMatches = { ...matches };
+    
+    const existingLeftItem = Object.entries(matches).find(([, r]) => r === rightItem)?.[0];
+    if (existingLeftItem && existingLeftItem !== leftItem) {
+      delete newMatches[existingLeftItem];
+    }
+    
+    newMatches[leftItem] = rightItem;
     setMatches(newMatches);
     onAnswer({ type: "drag-drop", matches: newMatches });
+  };
+
+  const handleReset = () => {
+    setMatches({});
+    onAnswer({ type: "drag-drop", matches: {} });
+    setShowExplanation(false);
   };
 
   const handleCheck = () => {
@@ -228,9 +241,14 @@ export default function DragDropQuestion({
       </DndContext>
 
       {!showExplanation && !reviewMode && (
-        <Button onClick={handleCheck} disabled={!allMatched} className="mt-2">
-          Check Answers
-        </Button>
+        <div className="flex gap-2 mt-2">
+          <Button onClick={handleCheck} disabled={!allMatched}>
+            Check Answers
+          </Button>
+          <Button variant="outline" onClick={handleReset}>
+            Reset
+          </Button>
+        </div>
       )}
 
       {showExplanation && (
