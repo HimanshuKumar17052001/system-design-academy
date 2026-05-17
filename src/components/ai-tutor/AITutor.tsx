@@ -171,9 +171,9 @@ export function AITutor({ moduleTitle, moduleContent }: AITutorProps) {
                       )}
                     >
                       {msg.role === "assistant" ? (
-                        <ReactMarkdown className="prose prose-xs prose-invert max-w-none">
-                          {msg.content}
-                        </ReactMarkdown>
+                        <div className="prose prose-xs prose-invert max-w-none">
+                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        </div>
                       ) : (
                         msg.content
                       )}
