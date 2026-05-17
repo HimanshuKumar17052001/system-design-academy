@@ -42,7 +42,7 @@ function shuffleArray<T>(array: T[]): T[] {
   return arr;
 }
 
-function DraggableItem({ id, label, disabled }: { id: string; label: string; disabled: boolean }) {
+function DraggableItem({ id, label, disabled, isMatched }: { id: string; label: string; disabled: boolean; isMatched?: boolean }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id, disabled });
 
   return (
@@ -52,12 +52,13 @@ function DraggableItem({ id, label, disabled }: { id: string; label: string; dis
       {...attributes}
       className={`px-4 py-3 rounded-lg border bg-card text-card-foreground shadow-sm cursor-grab active:cursor-grabbing transition-all ${
         isDragging ? "opacity-50 ring-2 ring-primary scale-105" : ""
-      } ${disabled ? "cursor-default opacity-70" : ""}`}
+      } ${disabled ? "cursor-default opacity-70" : ""} ${isMatched ? "border-dashed border-amber-400 bg-amber-50 dark:bg-amber-950" : ""}`}
       aria-label={`Draggable: ${label}`}
       role="button"
       tabIndex={disabled ? -1 : 0}
     >
       {label}
+      {isMatched && <span className="text-xs text-amber-600 dark:text-amber-400 ml-2">(placed)</span>}
     </div>
   );
 }
@@ -67,11 +68,15 @@ function DroppableZone({
   label,
   matchedLeft,
   status,
+  onRemove,
+  removable,
 }: {
   id: string;
   label: string;
   matchedLeft?: string;
   status?: "idle" | "correct" | "incorrect";
+  onRemove?: () => void;
+  removable?: boolean;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id });
 
@@ -93,7 +98,7 @@ function DroppableZone({
       <div className="text-sm font-medium text-muted-foreground mb-2">{label}</div>
       {matchedLeft ? (
         <div
-          className={`px-3 py-2 rounded-md text-sm font-medium ${
+          className={`px-3 py-2 rounded-md text-sm font-medium flex items-center justify-between ${
             status === "correct"
               ? "bg-green-100 text-green-900 dark:bg-green-900 dark:text-green-100"
               : status === "incorrect"
@@ -101,7 +106,15 @@ function DroppableZone({
               : "bg-card border shadow-sm"
           }`}
         >
-          {matchedLeft}
+          <span>{matchedLeft}</span>
+          {onRemove && removable && (
+            <button
+              onClick={onRemove}
+              className="text-xs text-muted-foreground hover:text-foreground ml-2"
+            >
+              ✕
+            </button>
+          )}
         </div>
       ) : (
         <div className="text-xs text-muted-foreground/60 italic">Drop item here</div>
@@ -123,6 +136,17 @@ export default function DragDropQuestion({
   const [matches, setMatches] = useState<Record<string, string>>(answer?.matches ?? {});
   const [showExplanation, setShowExplanation] = useState(checked || reviewMode);
   const [activeId, setActiveId] = useState<string | null>(null);
+
+  const handleRemoveMatch = (rightItem: string) => {
+    if (showExplanation || reviewMode) return;
+    const matchedLeft = Object.entries(matches).find(([, r]) => r === rightItem)?.[0];
+    if (matchedLeft) {
+      const newMatches = { ...matches };
+      delete newMatches[matchedLeft];
+      setMatches(newMatches);
+      onAnswer({ type: "drag-drop", matches: newMatches });
+    }
+  };
 
   useEffect(() => {
     if (answer?.matches) {
@@ -147,18 +171,25 @@ export default function DragDropQuestion({
     if (!over) return;
 
     const leftItem = String(active.id);
-    const rightItem = String(over.id);
-
-    if (!leftItems.includes(leftItem) || !rightItems.includes(rightItem)) return;
+    const overId = String(over.id);
 
     const newMatches = { ...matches };
-    
-    const existingLeftItem = Object.entries(matches).find(([, r]) => r === rightItem)?.[0];
+
+    if (overId === "pool") {
+      delete newMatches[leftItem];
+      setMatches(newMatches);
+      onAnswer({ type: "drag-drop", matches: newMatches });
+      return;
+    }
+
+    if (!leftItems.includes(leftItem) || !rightItems.includes(overId)) return;
+
+    const existingLeftItem = Object.entries(matches).find(([, r]) => r === overId)?.[0];
     if (existingLeftItem && existingLeftItem !== leftItem) {
       delete newMatches[existingLeftItem];
     }
-    
-    newMatches[leftItem] = rightItem;
+
+    newMatches[leftItem] = overId;
     setMatches(newMatches);
     onAnswer({ type: "drag-drop", matches: newMatches });
   };
@@ -195,19 +226,23 @@ export default function DragDropQuestion({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-3">
             <p className="text-sm font-medium text-muted-foreground">Terms / Concepts</p>
-            {leftItems
-              .filter((l) => !matches[l] || showExplanation)
-              .map((left) => (
-                <DraggableItem
-                  key={left}
-                  id={left}
-                  label={left}
-                  disabled={showExplanation || reviewMode}
-                />
-              ))}
-            {leftItems.filter((l) => !matches[l] || showExplanation).length === 0 && (
-              <p className="text-sm text-muted-foreground italic">All items matched</p>
-            )}
+            <div
+              id="pool"
+              className="rounded-lg border-2 border-dashed border-muted-foreground/25 bg-muted/30 p-3 min-h-[3rem]"
+            >
+              <p className="text-xs text-muted-foreground mb-2">Drag here to return</p>
+              <div className="flex flex-wrap gap-2">
+                {leftItems.map((left) => (
+                  <DraggableItem
+                    key={left}
+                    id={left}
+                    label={left}
+                    disabled={showExplanation || reviewMode}
+                    isMatched={!!matches[left]}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
 
           <div className="space-y-3">
@@ -225,6 +260,8 @@ export default function DragDropQuestion({
                   label={right}
                   matchedLeft={matchedLeft}
                   status={status}
+                  onRemove={() => handleRemoveMatch(right)}
+                  removable={!!matchedLeft && !showExplanation && !reviewMode}
                 />
               );
             })}

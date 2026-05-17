@@ -8,6 +8,7 @@ import { LessonRenderer } from "./LessonRenderer";
 import { CheckpointCard } from "./CheckpointCard";
 import LabRunner from "@/components/labs/LabRunner";
 import QuizEngine from "@/components/quizzes/QuizEngine";
+import { QuizGenerator } from "@/components/ai-tutor/QuizGenerator";
 import type { Module } from "@/types/curriculum";
 
 interface ModuleTabsProps {
@@ -58,7 +59,10 @@ export function ModuleTabs({ module }: ModuleTabsProps) {
         ) : null}
       </TabsContent>
 
-      <TabsContent value="quiz" className="mt-6">
+      <TabsContent value="quiz" className="mt-6 space-y-4">
+        <div className="flex justify-end">
+          <QuizGenerator moduleTitle={module.title} />
+        </div>
         {module.quiz ? (
           <QuizEngine quiz={module.quiz} />
         ) : null}

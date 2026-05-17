@@ -10,7 +10,6 @@ import { ModuleNotesDownloader } from "@/components/learn/ModuleNotesDownloader"
 import { AITutor } from "@/components/ai-tutor/AITutor";
 import { AITutorProvider } from "@/components/ai-tutor/AITutorContext";
 import { ConceptHighlighter } from "@/components/ai-tutor/ConceptHighlighter";
-import { QuizGenerator } from "@/components/ai-tutor/QuizGenerator";
 import { NotesCanvas } from "@/components/learn/NotesCanvas";
 import { Suspense } from "react";
 
@@ -56,7 +55,6 @@ export default async function ModulePage({ params }: ModulePageProps) {
             </Badge>
           </div>
           <div className="flex items-center gap-2">
-            <QuizGenerator moduleTitle={module.title} />
             <NotesCanvas moduleId={module.id} />
             <ModuleNotesDownloader module={module} />
           </div>

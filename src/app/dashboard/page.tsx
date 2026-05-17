@@ -35,42 +35,42 @@ const categoryMeta: Record<
   foundations: {
     label: "Foundations",
     icon: BookOpen,
-    gradient: "from-blue-500/10 to-indigo-500/10",
+    gradient: "from-blue-500/20 to-indigo-500/20",
   },
   lld: {
     label: "Low-Level Design",
     icon: Layers,
-    gradient: "from-emerald-500/10 to-teal-500/10",
+    gradient: "from-emerald-500/20 to-teal-500/20",
   },
   "core-distributed": {
     label: "Core Distributed Systems",
     icon: Server,
-    gradient: "from-orange-500/10 to-amber-500/10",
+    gradient: "from-orange-500/20 to-amber-500/20",
   },
   "architecture-patterns": {
     label: "Architecture Patterns",
     icon: Boxes,
-    gradient: "from-violet-500/10 to-purple-500/10",
+    gradient: "from-violet-500/20 to-purple-500/20",
   },
   "reliability-ops": {
     label: "Reliability & Operations",
     icon: ShieldCheck,
-    gradient: "from-rose-500/10 to-pink-500/10",
+    gradient: "from-rose-500/20 to-pink-500/20",
   },
   "real-world-systems": {
     label: "Real-World Systems",
     icon: Globe,
-    gradient: "from-cyan-500/10 to-sky-500/10",
+    gradient: "from-cyan-500/20 to-sky-500/20",
   },
   "expert-topics": {
     label: "Expert Topics",
     icon: Sparkles,
-    gradient: "from-fuchsia-500/10 to-pink-500/10",
+    gradient: "from-fuchsia-500/20 to-pink-500/20",
   },
   "interview-prep": {
     label: "Interview Prep",
     icon: MessageSquareCode,
-    gradient: "from-lime-500/10 to-green-500/10",
+    gradient: "from-lime-500/20 to-green-500/20",
   },
 };
 
@@ -145,7 +145,7 @@ export default function DashboardPage() {
     <AppShell>
       <div className="mx-auto max-w-6xl space-y-8">
         {/* Hero */}
-        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 px-6 py-10 md:px-10 md:py-14">
+        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 px-6 py-10 md:px-10 md:py-14">
           <div className="absolute inset-0 opacity-10">
             <div className="absolute -right-10 -top-10 size-64 rounded-full bg-blue-500 blur-3xl" />
             <div className="absolute -bottom-10 -left-10 size-64 rounded-full bg-indigo-500 blur-3xl" />

@@ -1,18 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { BookOpen, HelpCircle, Sparkles, FileQuestion } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { BookOpen, HelpCircle, FileQuestion } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useProgressStore } from "@/lib/progress";
 import { modules } from "@/data/curriculum";
 import { AppShell } from "@/components/layout/AppShell";
-import { AITutorProvider } from "@/components/ai-tutor/AITutorContext";
-import { QuizGenerator } from "@/components/ai-tutor/QuizGenerator";
-import { useAITutor } from "@/components/ai-tutor/AITutorContext";
-import { generateQuiz } from "@/lib/groq";
 
 interface QuizWithModule {
   moduleId: string;
@@ -26,7 +20,6 @@ interface QuizWithModule {
 
 function QuizListContent() {
   const quizScores = useProgressStore((s) => s.quizScores);
-  const { openTutor } = useAITutor();
 
   const quizzes: QuizWithModule[] = modules
     .filter((m) => m.quiz)
@@ -40,39 +33,12 @@ function QuizListContent() {
       passingScore: m.quiz!.passingScore,
     }));
 
-  const [aiQuizLoading, setAiQuizLoading] = useState(false);
-  const [generatedQuiz, setGeneratedQuiz] = useState<string | null>(null);
-
-  const handleGenerateAIQuiz = async () => {
-    setAiQuizLoading(true);
-    try {
-      const quiz = await generateQuiz("System Design Fundamentals", 5);
-      setGeneratedQuiz(quiz);
-      openTutor(`Here's an AI-generated quiz for you:\n\n${quiz}\n\nTake your time to answer these questions!`);
-    } catch (error) {
-      console.error("Failed to generate quiz:", error);
-    } finally {
-      setAiQuizLoading(false);
-    }
-  };
-
   return (
     <AppShell>
       <div className="mx-auto max-w-4xl space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Quizzes</h1>
-            <p className="text-muted-foreground">Test your knowledge across all modules</p>
-          </div>
-          <Button
-            variant="outline"
-            onClick={handleGenerateAIQuiz}
-            disabled={aiQuizLoading}
-            className="gap-2"
-          >
-            <Sparkles className="size-4" />
-            {aiQuizLoading ? "Generating..." : "AI Quiz"}
-          </Button>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Quizzes</h1>
+          <p className="text-muted-foreground">Test your knowledge across all modules</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -122,9 +88,5 @@ function QuizListContent() {
 }
 
 export default function QuizPage() {
-  return (
-    <AITutorProvider>
-      <QuizListContent />
-    </AITutorProvider>
-  );
+  return <QuizListContent />;
 }

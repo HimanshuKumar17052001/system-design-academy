@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 import { AuthModal } from "./AuthModal";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, BarChart3, User, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
@@ -18,6 +18,11 @@ function getInitials(name: string) {
     .join("")
     .toUpperCase()
     .slice(0, 2);
+}
+
+function getAvatarUrl(user: { user_metadata?: Record<string, unknown> }) {
+  const avatar = user.user_metadata?.avatar_url as string | undefined;
+  return avatar;
 }
 
 export function UserMenu() {
@@ -33,12 +38,7 @@ export function UserMenu() {
     if (isSigningOut) return;
     setIsSigningOut(true);
     setDropdownOpen(false);
-    try {
-      await signOut();
-      router.replace("/");
-    } catch {
-      router.replace("/");
-    }
+    signOut().then(() => router.replace("/")).catch(() => router.replace("/"));
   };
 
   const handleThemeToggle = () => {
@@ -69,6 +69,7 @@ export function UserMenu() {
   const displayName =
     (user.user_metadata?.full_name as string) || user.email || "User";
   const initials = getInitials(displayName);
+  const avatarUrl = getAvatarUrl(user);
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -80,6 +81,9 @@ export function UserMenu() {
         onClick={() => setDropdownOpen(!dropdownOpen)}
       >
         <Avatar className="size-8">
+          {avatarUrl ? (
+            <AvatarImage src={avatarUrl} alt={displayName} className="object-cover" />
+          ) : null}
           <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
             {initials}
           </AvatarFallback>
