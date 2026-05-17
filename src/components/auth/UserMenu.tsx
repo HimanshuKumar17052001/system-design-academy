@@ -23,13 +23,20 @@ export function UserMenu() {
   const { user, isAuthenticated, signOut } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   const handleSignOut = async () => {
-    await signOut();
-    router.push("/");
-    setDropdownOpen(false);
+    if (isSigningOut) return;
+    setIsSigningOut(true);
+    try {
+      await signOut();
+      setDropdownOpen(false);
+      router.push("/");
+    } finally {
+      setIsSigningOut(false);
+    }
   };
 
   useEffect(() => {
@@ -102,10 +109,11 @@ export function UserMenu() {
           <div className="border-t pt-1">
             <button
               onClick={handleSignOut}
-              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-destructive hover:bg-accent rounded-md cursor-pointer"
+              disabled={isSigningOut}
+              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-destructive hover:bg-accent rounded-md cursor-pointer disabled:opacity-50"
             >
-              <LogOut className="size-4" />
-              Sign Out
+              <LogOut className={cn("size-4", isSigningOut && "animate-spin")} />
+              {isSigningOut ? "Signing out..." : "Sign Out"}
             </button>
           </div>
         </div>
