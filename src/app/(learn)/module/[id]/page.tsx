@@ -9,6 +9,7 @@ import { ModuleLockGate } from "@/components/learn/ModuleLockGate";
 import { ModuleNotesDownloader } from "@/components/learn/ModuleNotesDownloader";
 import { AITutor } from "@/components/ai-tutor/AITutor";
 import { ConceptHighlighter } from "@/components/ai-tutor/ConceptHighlighter";
+import { QuizGenerator } from "@/components/ai-tutor/QuizGenerator";
 import { Suspense } from "react";
 
 interface ModulePageProps {
@@ -52,7 +53,10 @@ export default async function ModulePage({ params }: ModulePageProps) {
               {module.difficulty}
             </Badge>
           </div>
-          <ModuleNotesDownloader module={module} />
+          <div className="flex items-center gap-2">
+            <QuizGenerator moduleTitle={module.title} />
+            <ModuleNotesDownloader module={module} />
+          </div>
         </div>
         <p className="text-muted-foreground">{module.subtitle}</p>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
