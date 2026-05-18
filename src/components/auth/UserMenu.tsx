@@ -35,8 +35,13 @@ export function UserMenu() {
 
   const handleSignOut = async () => {
     setDropdownOpen(false);
-    await signOut();
+    try {
+      await signOut();
+    } catch (error) {
+      console.error("Sign out error:", error);
+    }
     router.replace("/");
+    window.location.reload();
   };
 
   const handleThemeToggle = () => {
