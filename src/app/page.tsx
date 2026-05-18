@@ -334,13 +334,20 @@ export default function LandingPage() {
   const yTitle = useTransform(scrollYProgress, [0, 1], [0, -80]);
   const ySubtitle = useTransform(scrollYProgress, [0, 1], [0, -40]);
   const yButton = useTransform(scrollYProgress, [0, 1], [0, -20]);
-  const yPills = useTransform(scrollYProgress, [0, 0.5], [0, -30]);
+  const yPills = useTransform(scrollYProgress, [0, 1], [0, -30]);
 
   const opacityBadge = useTransform(scrollYProgress, [0, 0.7], [1, 0.2]);
   const opacityTitle = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
   const opacitySubtitle = useTransform(scrollYProgress, [0, 0.8], [1, 0.3]);
   const opacityButton = useTransform(scrollYProgress, [0, 0.85], [1, 0.5]);
-  const opacityPills = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const opacityPills = useTransform(scrollYProgress, [0, 1], [1, 0]);
+
+  const statsRef = useRef<HTMLDivElement>(null);
+  const statsScrollYProgress = useScroll({ target: statsRef, offset: ["start end", "end start"] }).scrollYProgress;
+  const statsY0 = useTransform(statsScrollYProgress, [0, 1], [0, -30]);
+  const statsY1 = useTransform(statsScrollYProgress, [0, 1], [0, -30]);
+  const statsY2 = useTransform(statsScrollYProgress, [0, 1], [0, -30]);
+  const statsY3 = useTransform(statsScrollYProgress, [0, 1], [0, -30]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -484,7 +491,7 @@ export default function LandingPage() {
       </section>
 
       {/* Stats */}
-      <section className="border-b py-12">
+      <section ref={statsRef} className="border-b py-12">
         <div className="mx-auto max-w-6xl px-4 md:px-6">
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             {[
@@ -499,6 +506,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ delay: i * 0.1, duration: 0.4 }}
+                style={{ y: [statsY0, statsY1, statsY2, statsY3][i] }}
                 className="text-center"
               >
                 <div className="text-3xl font-bold text-foreground md:text-4xl">
