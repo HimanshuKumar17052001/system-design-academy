@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { NotesCanvas, useNotesCanvas } from "@/components/notes/NotesCanvas";
-import { FileText } from "lucide-react";
+import { PanelRightClose, PanelRightOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 function NotesProviderInner({ children }: { children: React.ReactNode }) {
   const { open, setOpen } = useNotesCanvas();
@@ -24,14 +25,18 @@ function NotesProviderInner({ children }: { children: React.ReactNode }) {
     <>
       {children}
       <NotesCanvas open={open} onOpenChange={setOpen} />
+      {/* Floating toggle button at bottom right */}
       <Button
-        variant="default"
+        variant="outline"
         size="icon"
-        className="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full shadow-lg bg-primary hover:bg-primary/90"
+        className={cn(
+          "fixed bottom-20 right-6 z-45 h-10 w-10 rounded-full shadow-lg border-2 bg-background",
+          open && "hidden"
+        )}
         onClick={() => setOpen(true)}
         title="Open Notes (Cmd+N)"
       >
-        <FileText className="size-5" />
+        <PanelRightOpen className="size-5" />
       </Button>
     </>
   );
