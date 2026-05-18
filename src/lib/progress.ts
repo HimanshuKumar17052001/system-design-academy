@@ -128,6 +128,15 @@ export const useProgressStore = create<ProgressState>()(
     }),
     {
       name: "sda-progress",
+      partialize: (state) => ({
+        completedModules: state.completedModules,
+        moduleScores: state.moduleScores,
+        quizScores: state.quizScores,
+        labCompletions: state.labCompletions,
+        bookmarks: state.bookmarks,
+        lastVisited: state.lastVisited,
+        totalStudyTimeMinutes: state.totalStudyTimeMinutes,
+      }),
     }
   )
 );
