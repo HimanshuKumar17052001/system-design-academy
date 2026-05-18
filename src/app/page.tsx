@@ -329,6 +329,10 @@ export default function LandingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const shouldReduceMotion = useRef(false);
+  useEffect(() => {
+    shouldReduceMotion.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }, []);
 
   const yBadge = useTransform(scrollYProgress, [0, 1], [0, -60]);
   const yTitle = useTransform(scrollYProgress, [0, 1], [0, -80]);
@@ -422,7 +426,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.4 }}
-              style={{ y: yBadge, opacity: opacityBadge }}
+              style={{ y: shouldReduceMotion.current ? 0 : yBadge, opacity: opacityBadge }}
             >
               <Badge variant="secondary" className="mb-6 text-sm">
                 53 Modules · 25 Simulations · 100% Free
@@ -433,7 +437,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              style={{ y: yTitle, opacity: opacityTitle }}
+              style={{ y: shouldReduceMotion.current ? 0 : yTitle, opacity: opacityTitle }}
             >
               Master System
               <br />
@@ -444,7 +448,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
-              style={{ y: ySubtitle, opacity: opacitySubtitle }}
+              style={{ y: shouldReduceMotion.current ? 0 : ySubtitle, opacity: opacitySubtitle }}
             >
               From HTTP fundamentals to designing Uber and Twitter at scale.
               Interactive lessons, hands-on labs, and real-world case studies for
@@ -455,7 +459,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.5 }}
-              style={{ y: yButton, opacity: opacityButton }}
+              style={{ y: shouldReduceMotion.current ? 0 : yButton, opacity: opacityButton }}
             >
               {isAuthenticated ? (
                 <Link href="/dashboard">
@@ -476,7 +480,7 @@ export default function LandingPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5, duration: 0.4 }}
-              style={{ y: yPills, opacity: opacityPills }}
+              style={{ y: shouldReduceMotion.current ? 0 : yPills, opacity: opacityPills }}
             >
               <div className="flex items-center gap-1.5">
                 <CheckCircle className="size-4 text-emerald-500" />
@@ -512,7 +516,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ delay: i * 0.1, duration: 0.4 }}
-                style={{ y: [statsY0, statsY1, statsY2, statsY3][i] }}
+                style={{ y: shouldReduceMotion.current ? 0 : [statsY0, statsY1, statsY2, statsY3][i] }}
                 className="text-center"
               >
                 <div className="text-3xl font-bold text-foreground md:text-4xl">
@@ -608,14 +612,14 @@ export default function LandingPage() {
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5 }}
           >
-            <motion.h2 style={{ y: ctaYHeading }} className="text-3xl font-bold tracking-tight md:text-4xl">
+            <motion.h2 style={{ y: shouldReduceMotion.current ? 0 : ctaYHeading }} className="text-3xl font-bold tracking-tight md:text-4xl">
               Ready to Master System Design?
             </motion.h2>
-            <motion.p style={{ y: ctaYSubtitle }} className="mx-auto mt-4 max-w-xl text-muted-foreground">
+            <motion.p style={{ y: shouldReduceMotion.current ? 0 : ctaYSubtitle }} className="mx-auto mt-4 max-w-xl text-muted-foreground">
               Start with Module 1 and work your way through 53 interactive modules.
               Your certificate awaits at the finish line.
             </motion.p>
-            <motion.div style={{ y: ctaYButton }} className="mt-8">
+            <motion.div style={{ y: shouldReduceMotion.current ? 0 : ctaYButton }} className="mt-8">
               {isAuthenticated ? (
                 <Link href="/dashboard">
                   <Button size="lg" className="gap-2 text-base">
