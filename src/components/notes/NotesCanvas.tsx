@@ -185,18 +185,18 @@ export function NotesCanvas({ open, onOpenChange }: NotesCanvasProps) {
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop - lighter for studying */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50"
+          className="fixed inset-0 bg-black/10 backdrop-blur-[2px] z-40"
           onClick={() => onOpenChange(false)}
         />
       )}
 
-      {/* Drawer */}
+      {/* Drawer - slide from right with 50% width for studying */}
       <div
         className={cn(
-          "fixed top-0 right-0 h-full w-[600px] max-w-[90vw] bg-background border-l shadow-2xl z-50 transform transition-transform duration-300 ease-in-out",
+          "fixed top-0 right-0 h-full w-[50%] min-w-[500px] bg-background/95 backdrop-blur border-l shadow-2xl z-50 transform transition-transform duration-300 ease-in-out",
           open ? "translate-x-0" : "translate-x-full"
         )}
       >
