@@ -41,7 +41,8 @@ export async function syncProgressToDB(
 
     if (error) {
       console.error("Failed to sync progress to DB:", error);
-      if (isBrowser()) {
+      // 401 means not authenticated - don't save to localStorage in that case
+      if (isBrowser() && error.code !== "401" && error.code !== "403") {
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(progress));
       }
       return { success: false, error: error.message };
