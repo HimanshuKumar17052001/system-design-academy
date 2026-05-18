@@ -21,8 +21,15 @@ export async function syncProgressToDB(
   userId: string,
   progress: UserProgress
 ): Promise<{ success: boolean; error?: string }> {
+  if (!userId) {
+    console.warn("syncProgressToDB: No userId provided");
+    return { success: false, error: "No user ID" };
+  }
+
   try {
     const supabase = createClient();
+    console.log("syncProgressToDB: Starting sync for user:", userId);
+    console.log("Progress data:", JSON.stringify(progress, null, 2));
 
     const { error } = await supabase.from("user_progress").upsert(
       {
@@ -41,20 +48,20 @@ export async function syncProgressToDB(
 
     if (error) {
       console.error("Failed to sync progress to DB:", error);
-      // 401 means not authenticated - don't save to localStorage in that case
+      console.error("Error code:", error.code);
+      console.error("Error message:", error.message);
+      // 401/403 means not authenticated - don't save to localStorage in that case
       if (isBrowser() && error.code !== "401" && error.code !== "403") {
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(progress));
       }
       return { success: false, error: error.message };
     }
 
+    console.log("Sync successful!");
     return { success: true };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     console.error("Unexpected error syncing progress:", message);
-    if (isBrowser()) {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(progress));
-    }
     return { success: false, error: message };
   }
 }
@@ -62,8 +69,14 @@ export async function syncProgressToDB(
 export async function fetchProgressFromDB(
   userId: string
 ): Promise<UserProgress | null> {
+  if (!userId) {
+    console.warn("fetchProgressFromDB: No userId provided");
+    return null;
+  }
+
   try {
     const supabase = createClient();
+    console.log("fetchProgressFromDB: Fetching for user:", userId);
 
     const { data, error } = await supabase
       .from("user_progress")
@@ -75,13 +88,19 @@ export async function fetchProgressFromDB(
 
     if (error) {
       if (error.code === "PGRST116") {
+        console.log("fetchProgressFromDB: No progress found for user");
         return null;
       }
       console.error("Failed to fetch progress from DB:", error);
       return null;
     }
 
-    if (!data) return null;
+    if (!data) {
+      console.log("fetchProgressFromDB: No data returned");
+      return null;
+    }
+
+    console.log("fetchProgressFromDB: Success! Data:", JSON.stringify(data, null, 2));
 
     return {
       completedModules: data.completed_modules ?? [],

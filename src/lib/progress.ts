@@ -33,11 +33,15 @@ const initialState: UserProgress = {
 let syncTimeout: ReturnType<typeof setTimeout> | null = null;
 
 function debouncedSync(userId: string | null, state: UserProgress) {
-  if (!userId) return;
+  if (!userId) {
+    console.log("debouncedSync: no userId, skipping sync");
+    return;
+  }
   if (syncTimeout) clearTimeout(syncTimeout);
   syncTimeout = setTimeout(() => {
-    syncProgressToDB(userId, state).catch(() => {
-      // Silently fail — localStorage is the source of truth as fallback
+    console.log("Syncing progress to DB for user:", userId);
+    syncProgressToDB(userId, state).catch((err) => {
+      console.error("Sync failed:", err);
     });
   }, 2000);
 }
@@ -48,7 +52,10 @@ export const useProgressStore = create<ProgressState>()(
       ...initialState,
       _userId: null,
 
-      setUserId: (userId: string | null) => set({ _userId: userId }),
+      setUserId: (userId: string | null) => {
+        console.log("setUserId called with:", userId);
+        set({ _userId: userId });
+      },
 
       markModuleComplete: (id: string) =>
         set((state) => {
