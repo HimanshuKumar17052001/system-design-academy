@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -26,7 +26,7 @@ import {
   Sun,
   Send,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -327,6 +327,20 @@ export default function LandingPage() {
   const [contactForm, setContactForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [contactStatus, setContactStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+
+  const yBadge = useTransform(scrollYProgress, [0, 1], [0, -60]);
+  const yTitle = useTransform(scrollYProgress, [0, 1], [0, -80]);
+  const ySubtitle = useTransform(scrollYProgress, [0, 1], [0, -40]);
+  const yButton = useTransform(scrollYProgress, [0, 1], [0, -20]);
+  const yPills = useTransform(scrollYProgress, [0, 0.5], [0, -30]);
+
+  const opacityBadge = useTransform(scrollYProgress, [0, 0.7], [1, 0.2]);
+  const opacityTitle = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+  const opacitySubtitle = useTransform(scrollYProgress, [0, 0.8], [1, 0.3]);
+  const opacityButton = useTransform(scrollYProgress, [0, 0.85], [1, 0.5]);
+  const opacityPills = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -369,7 +383,7 @@ export default function LandingPage() {
       <ThemeToggle />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden border-b">
+      <section ref={heroRef} className="relative overflow-hidden border-b" style={{ height: "200vh" }}>
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5" />
         <motion.div
           className="absolute inset-0 opacity-60"
@@ -383,6 +397,7 @@ export default function LandingPage() {
           }}
           transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
         />
+        <div className="sticky top-0 h-screen flex items-center justify-center">
         <div className="relative mx-auto max-w-6xl px-4 py-24 md:px-6 lg:py-32">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -394,6 +409,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.4 }}
+              style={{ y: yBadge, opacity: opacityBadge }}
             >
               <Badge variant="secondary" className="mb-6 text-sm">
                 53 Modules · 25 Simulations · 100% Free
@@ -404,6 +420,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
+              style={{ y: yTitle, opacity: opacityTitle }}
             >
               Master System
               <br />
@@ -414,6 +431,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
+              style={{ y: ySubtitle, opacity: opacitySubtitle }}
             >
               From HTTP fundamentals to designing Uber and Twitter at scale.
               Interactive lessons, hands-on labs, and real-world case studies for
@@ -424,6 +442,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.5 }}
+              style={{ y: yButton, opacity: opacityButton }}
             >
               {isAuthenticated ? (
                 <Link href="/dashboard">
@@ -444,6 +463,7 @@ export default function LandingPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5, duration: 0.4 }}
+              style={{ y: yPills, opacity: opacityPills }}
             >
               <div className="flex items-center gap-1.5">
                 <CheckCircle className="size-4 text-emerald-500" />
@@ -459,6 +479,7 @@ export default function LandingPage() {
               </div>
             </motion.div>
           </motion.div>
+        </div>
         </div>
       </section>
 
