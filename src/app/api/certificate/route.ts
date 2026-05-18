@@ -179,7 +179,7 @@ export async function POST(request: NextRequest) {
       try {
         const resend = new Resend(resendApiKey);
         await resend.emails.send({
-          from: `System Design Academy <${process.env.CERTIFICATE_FROM_EMAIL || "onboarding@resend.dev"}>`,
+          from: `System Design Academy <${process.env.FROM_EMAIL || "support@system-design-academy.online"}>`,
 
           to: email,
           subject: "Your System Design Academy Certificate",

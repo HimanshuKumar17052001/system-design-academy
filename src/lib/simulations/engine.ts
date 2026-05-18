@@ -60,15 +60,15 @@ export function runSimulation(
     case "pitfall-detector":
       return runPitfallDetectorSimulation();
     case "load-balancer":
-      return runStub("Load Balancer", "Configure load balancing algorithms and observe traffic distribution.");
+      return runLoadBalancerSimulation(controls, parameters);
     case "consistent-hash":
-      return runStub("Consistent Hash", "Visualize consistent hashing with virtual nodes.");
+      return runConsistentHashSimulation(controls);
     case "traffic-simulator":
-      return runStub("Traffic Flow", "Observe request flow through CDN, cache, and origin.");
+      return runTrafficSimulatorSimulation(controls);
     case "db-scaling":
-      return runStub("DB Scaling", "Compare vertical vs horizontal database scaling.");
+      return runDBScalingSimulation(controls);
     case "mq-visualizer":
-      return runStub("Message Queue", "Visualize message queue processing with consumers.");
+      return runMessageQueueSimulation(controls);
     default:
       return {
         title: "Simulation Result",
@@ -130,6 +130,207 @@ function runLoadBalancerSimulation(
       `Speed: ${speed}x`,
       "Interactive mode — adjust server weights, mark servers as slow/failed, and observe traffic redistribution.",
     ],
+    metrics,
+    state,
+    events,
+  };
+}
+
+function runConsistentHashSimulation(controls: SimulationControls): SimulationResult {
+  const nodeCount = Number(controls.nodes ?? 3);
+  const virtualNodes = Number(controls.virtualNodes ?? 3);
+  const useVirtual = controls.useVirtualNodes === true || controls.useVirtualNodes === "true";
+  const keyCount = Number(controls.keyCount ?? 12);
+
+  const events = [
+    `Initialized consistent hash ring with ${nodeCount} physical nodes`,
+    useVirtual ? `Added ${virtualNodes} virtual nodes per physical (total ${nodeCount * virtualNodes})` : "Using physical nodes only",
+    `Distributing ${keyCount} keys across ring`,
+    "Hash space: 0 to 2^32-1",
+    "Each key maps to the first node clockwise on the ring",
+    useVirtual ? "Virtual nodes provide better distribution and easier node add/remove" : "Adding/removing nodes causes significant key remapping",
+  ];
+
+  const metrics: SimulationMetric[] = [
+    { label: "Physical Nodes", value: nodeCount, unit: "", tone: "neutral" },
+    { label: "Virtual Nodes", value: useVirtual ? nodeCount * virtualNodes : 0, unit: "", tone: "neutral" },
+    { label: "Keys", value: keyCount, unit: "", tone: "neutral" },
+    { label: "Rebalance on Add", value: useVirtual ? "1/n" : "~1", unit: "fraction", tone: "good" },
+  ];
+
+  const state: SimulationStateItem[] = [
+    { label: "Ring Status", value: "Healthy", status: "success", tone: "good" },
+    { label: "Node Count", value: useVirtual ? nodeCount * virtualNodes : nodeCount, tone: "neutral" },
+    { label: "Virtual Nodes", value: useVirtual ? "On" : "Off", tone: "neutral" },
+  ];
+
+  return {
+    title: "Consistent Hash Simulation",
+    summary: `Simulating consistent hashing with ${nodeCount} nodes${useVirtual ? ` and ${virtualNodes} virtual nodes each` : ''}. Keys are distributed using a hash ring to minimize reorganization when nodes are added or removed.`,
+    output: [
+      `Physical nodes: ${nodeCount}`,
+      `Virtual nodes per node: ${useVirtual ? virtualNodes : "disabled"}`,
+      `Total ring entries: ${useVirtual ? nodeCount * virtualNodes : nodeCount}`,
+      `Keys to distribute: ${keyCount}`,
+      `Expected distribution: ~${Math.round(keyCount / (useVirtual ? nodeCount * virtualNodes : nodeCount))} keys per node`,
+    ],
+    metrics,
+    state,
+    events,
+  };
+}
+
+function runTrafficSimulatorSimulation(controls: SimulationControls): SimulationResult {
+  const cdnEnabled = controls.cdnEnabled !== false;
+  const cacheEnabled = controls.cacheEnabled !== false;
+  const load = Number(controls.load ?? 1);
+  const speed = Number(controls.speed ?? 1);
+
+  const cacheHitRate = cdnEnabled ? 0.6 : 0;
+  const avgLatency = cdnEnabled ? 50 : cacheEnabled ? 120 : 250;
+  const dbQueries = cacheEnabled ? 0.4 : 1.0;
+
+  const events = [
+    cdnEnabled ? "CDN enabled - requests may be served from edge cache" : "CDN disabled - all requests go to origin",
+    cacheEnabled ? "Application cache enabled - reduces database load" : "Application cache disabled",
+    `Traffic load: ${load}x`,
+    `Average latency: ~${avgLatency}ms`,
+    `Cache hit rate: ${Math.round(cacheHitRate * 100)}%`,
+    `DB query ratio: ${dbQueries * 100}%`,
+  ];
+
+  const metrics: SimulationMetric[] = [
+    { label: "Avg Latency", value: avgLatency, unit: "ms", tone: avgLatency < 100 ? "good" : avgLatency < 200 ? "warning" : "danger" },
+    { label: "Cache Hit Rate", value: `${Math.round(cacheHitRate * 100)}%`, tone: cacheHitRate > 0.5 ? "good" : cacheHitRate > 0.2 ? "warning" : "danger" },
+    { label: "DB Query Ratio", value: `${Math.round(dbQueries * 100)}%`, tone: dbQueries < 0.5 ? "good" : dbQueries < 0.8 ? "warning" : "danger" },
+    { label: "Throughput", value: load * 1000, unit: "req/s", tone: "neutral" },
+  ];
+
+  const state: SimulationStateItem[] = [
+    { label: "CDN", value: cdnEnabled ? "Enabled" : "Disabled", tone: cdnEnabled ? "good" : "neutral" },
+    { label: "App Cache", value: cacheEnabled ? "Enabled" : "Disabled", tone: cacheEnabled ? "good" : "neutral" },
+    { label: "Traffic", value: `${load}x`, tone: "neutral" },
+  ];
+
+  return {
+    title: "Traffic Flow Simulation",
+    summary: `Simulating request flow through CDN (${cdnEnabled ? "enabled" : "disabled"}), app cache (${cacheEnabled ? "enabled" : "disabled"}), and database at ${load}x load.`,
+    output: [
+      `Path: Client → ${cdnEnabled ? "CDN" : ""} → ${cacheEnabled ? "App Cache" : ""} → App Server → Database`,
+      `Latency: ${avgLatency}ms average`,
+      `Cache hit rate: ${Math.round(cacheHitRate * 100)}%`,
+      `DB query fraction: ${Math.round(dbQueries * 100)}%`,
+    ],
+    metrics,
+    state,
+    events,
+  };
+}
+
+function runDBScalingSimulation(controls: SimulationControls): SimulationResult {
+  const mode = (controls.mode as string) || "single";
+  const readQps = Number(controls.readQps ?? 100);
+  const writeQps = Number(controls.writeQps ?? 10);
+  const replicaCount = Number(controls.replicas ?? 2);
+  const shardCount = Number(controls.shards ?? 3);
+
+  const totalQps = readQps + writeQps;
+  let connections = totalQps;
+  let latency = 5;
+  let lag = 0;
+
+  if (mode === "replica") {
+    connections = Math.min(writeQps + readQps / (replicaCount + 1), 500);
+    latency = 8;
+    lag = Math.round(readQps / (replicaCount * 200));
+  } else if (mode === "shard") {
+    const perShardQps = totalQps / shardCount;
+    connections = Math.min(perShardQps, 500);
+    latency = 12;
+  }
+
+  const events = [
+    `Mode: ${mode}`,
+    mode === "single" ? "All read/write on single primary" : "",
+    mode === "replica" ? `${replicaCount} read replicas distributing ${readQps} read QPS` : "",
+    mode === "shard" ? `${shardCount} shards distributing load horizontally` : "",
+    `Total connections: ${connections}/500`,
+    `Estimated latency: ${latency}ms`,
+    mode === "replica" ? `Replication lag: ~${lag}ms` : "",
+  ].filter(Boolean);
+
+  const metrics: SimulationMetric[] = [
+    { label: "Total QPS", value: totalQps, unit: "", tone: totalQps > 2000 ? "warning" : "good" },
+    { label: "Connections", value: connections, unit: "/500", tone: connections > 400 ? "danger" : connections > 300 ? "warning" : "good" },
+    { label: "Latency", value: latency, unit: "ms", tone: latency < 15 ? "good" : latency < 30 ? "warning" : "danger" },
+    { label: "Replication Lag", value: lag, unit: "ms", tone: lag < 50 ? "good" : lag < 200 ? "warning" : "danger" },
+  ];
+
+  const state: SimulationStateItem[] = [
+    { label: "Mode", value: mode, tone: "neutral" },
+    { label: "Replicas", value: mode === "replica" ? replicaCount : 0, tone: "neutral" },
+    { label: "Shards", value: mode === "shard" ? shardCount : 0, tone: "neutral" },
+    { label: "Write QPS", value: writeQps, tone: "neutral" },
+  ];
+
+  return {
+    title: "DB Scaling Simulation",
+    summary: `Simulating ${mode} database scaling with ${readQps} read QPS and ${writeQps} write QPS.`,
+    output: [
+      `Scaling mode: ${mode}`,
+      `Read QPS: ${readQps}, Write QPS: ${writeQps}`,
+      mode === "replica" ? `Read replicas: ${replicaCount}` : "",
+      mode === "shard" ? `Shard count: ${shardCount}` : "",
+      `Max connections: ${connections}/500`,
+      `Avg latency: ${latency}ms`,
+    ].filter(Boolean),
+    metrics,
+    state,
+    events,
+  };
+}
+
+function runMessageQueueSimulation(controls: SimulationControls): SimulationResult {
+  const queueType = (controls.queueType as string) || "point-to-point";
+  const consumerCount = Number(controls.consumers ?? 3);
+  const deliveryMode = (controls.deliveryMode as string) || "at-least-once";
+  const throughput = Number(controls.throughput ?? 50);
+
+  const events = [
+    `Queue type: ${queueType}`,
+    `Consumer count: ${consumerCount}`,
+    `Delivery mode: ${deliveryMode}`,
+    `Target throughput: ${throughput} msgs/s`,
+    deliveryMode === "at-least-once" ? "Messages may be redelivered (compensate with idempotency)" : "",
+    deliveryMode === "at-most-once" ? "Messages may be lost (acceptable for logging)" : "",
+    deliveryMode === "exactly-once" ? "Duplicates eliminated via deduplication (higher latency)" : "",
+    queueType === "pub-sub" ? "Fan-out to all consumers - each gets every message" : "Load-balanced across consumers",
+  ].filter(Boolean);
+
+  const metrics: SimulationMetric[] = [
+    { label: "Consumers", value: consumerCount, unit: "", tone: "neutral" },
+    { label: "Queue Type", value: queueType === "point-to-point" ? "P2P" : "Pub/Sub", tone: "neutral" },
+    { label: "Delivery", value: deliveryMode.split("-")[0], tone: "neutral" },
+    { label: "Throughput", value: throughput, unit: "msg/s", tone: throughput > 100 ? "good" : "warning" },
+  ];
+
+  const state: SimulationStateItem[] = [
+    { label: "Queue", value: queueType === "point-to-point" ? "Point-to-Point" : "Pub/Sub", tone: "neutral" },
+    { label: "Consumers", value: consumerCount, tone: "neutral" },
+    { label: "Mode", value: deliveryMode, tone: "neutral" },
+    { label: "Status", value: "Running", status: "running", tone: "good" },
+  ];
+
+  return {
+    title: "Message Queue Simulation",
+    summary: `Simulating ${queueType} queue with ${consumerCount} consumers using ${deliveryMode} delivery mode at ${throughput} msgs/s throughput.`,
+    output: [
+      `Queue type: ${queueType}`,
+      `Consumers: ${consumerCount}`,
+      `Delivery guarantee: ${deliveryMode}`,
+      `Target throughput: ${throughput} msgs/s`,
+      deliveryMode === "at-least-once" ? "Requires idempotent consumers" : "",
+    ].filter(Boolean),
     metrics,
     state,
     events,

@@ -108,7 +108,7 @@ export const phase4Modules: Module[] = [
     lab: {
       id: "microservices-builder-lab",
       title: "Architecture Decision Lab",
-      kind: "microservices-builder",
+      kind: "architecture-builder",
       objective: "Given a set of requirements, decide which components should be monolithic vs microservice.",
       hint: "Start monolithic. Extract only when there is a clear scaling, technology, or team boundary reason.",
     },

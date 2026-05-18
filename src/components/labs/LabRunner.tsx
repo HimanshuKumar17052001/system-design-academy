@@ -216,12 +216,21 @@ export default function LabRunner({ lab, onComplete }: LabRunnerProps) {
       case "saga-simulator":
         return <SagaSimulator />;
       case "case-study-walkthrough":
-        return (
-          <div className="rounded-lg border p-8 text-center text-muted-foreground">
-            Interactive simulation for <code>{lab.kind}</code> is running in engine mode.
-            Use the controls and Run Simulation to explore the scenario.
-          </div>
-        );
+        switch (lab.id) {
+          case "url-shortener-lab":
+            return <URLShortenerCase />;
+          case "twitter-lab":
+            return <TwitterCase />;
+          case "uber-lab":
+            return <UberCase />;
+          default:
+            return (
+              <div className="rounded-lg border p-8 text-center text-muted-foreground">
+                Interactive simulation for <code>{lab.kind}</code> is running in engine mode.
+                Use the controls and Run Simulation to explore the scenario.
+              </div>
+            );
+        }
       case "deployment-visualizer":
         return <DeploymentVisualizer />;
       case "chaos-lab":

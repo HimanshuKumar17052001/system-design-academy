@@ -24,9 +24,13 @@ import {
   X,
   Moon,
   Sun,
+  Send,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { AuthModal } from "@/components/auth/AuthModal";
@@ -319,6 +323,9 @@ export default function LandingPage() {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
   const [authOpen, setAuthOpen] = useState(false);
+  const [contactForm, setContactForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [contactStatus, setContactStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -329,6 +336,30 @@ export default function LandingPage() {
   const handleStartLearning = () => {
     if (!isAuthenticated) {
       setAuthOpen(true);
+    }
+  };
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setContactStatus(null);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(contactForm),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setContactStatus({ type: "success", message: data.message });
+        setContactForm({ name: "", email: "", subject: "", message: "" });
+      } else {
+        setContactStatus({ type: "error", message: data.message });
+      }
+    } catch {
+      setContactStatus({ type: "error", message: "Failed to send message. Please try again." });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -525,6 +556,98 @@ export default function LandingPage() {
               Free forever. No credit card required.
             </p>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Contact Us */}
+      <section className="py-20 border-y">
+        <div className="mx-auto max-w-6xl px-4 md:px-6">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+              Contact Us
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              Have questions or feedback? We'd love to hear from you.
+            </p>
+          </div>
+          <div className="mx-auto max-w-xl">
+            <Card>
+              <CardHeader>
+                <CardTitle>Send us a message</CardTitle>
+                <CardDescription>
+                  Fill out the form below and we'll get back to you as soon as possible.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleContactSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                      id="name"
+                      placeholder="Your name"
+                      value={contactForm.name}
+                      onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="your.email@example.com"
+                      value={contactForm.email}
+                      onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="subject">Subject</Label>
+                    <Input
+                      id="subject"
+                      placeholder="What is this about?"
+                      value={contactForm.subject}
+                      onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="message">Message</Label>
+                    <textarea
+                      id="message"
+                      placeholder="Your message..."
+                      rows={5}
+                      className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                      value={contactForm.message}
+                      onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                      required
+                    />
+                  </div>
+                  {contactStatus && contactStatus.message && (
+                    <div
+                      className={`rounded-lg p-3 text-sm ${
+                        contactStatus.type === "success"
+                          ? "bg-green-500/10 text-green-500 border border-green-500/20"
+                          : "bg-red-500/10 text-red-500 border border-red-500/20"
+                      }`}
+                    >
+                      {contactStatus.message}
+                    </div>
+                  )}
+                  <Button type="submit" className="w-full gap-2" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                      "Sending..."
+                    ) : (
+                      <>
+                        <Send className="size-4" />
+                        Send Message
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
 
