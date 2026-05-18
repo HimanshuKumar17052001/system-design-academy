@@ -21,140 +21,230 @@ export interface NoteFolder {
 
 const supabase = createClient();
 
-export async function getNotes(): Promise<Note[]> {
-  const { data, error } = await supabase
-    .from("user_notes")
-    .select("*")
-    .order("updated_at", { ascending: false });
+const LOCAL_STORAGE_KEY = "system-design-academy-notes";
+const LOCAL_FOLDERS_KEY = "system-design-academy-note-folders";
 
-  if (error) {
-    console.error("Error fetching notes:", error);
-    return [];
+function getLocalNotes(): Note[] {
+  if (typeof window === "undefined") return [];
+  const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+function setLocalNotes(notes: Note[]) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(notes));
+}
+
+function getLocalFolders(): NoteFolder[] {
+  if (typeof window === "undefined") return [];
+  const data = localStorage.getItem(LOCAL_FOLDERS_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+function setLocalFolders(folders: NoteFolder[]) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(LOCAL_FOLDERS_KEY, JSON.stringify(folders));
+}
+
+function generateId(): string {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+export async function getNotes(): Promise<Note[]> {
+  try {
+    const { data, error } = await supabase
+      .from("user_notes")
+      .select("*")
+      .order("updated_at", { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.warn("Using local storage for notes (Supabase unavailable)");
+    return getLocalNotes();
   }
-  return data || [];
 }
 
 export async function getNotesByModule(moduleId: string): Promise<Note[]> {
-  const { data, error } = await supabase
-    .from("user_notes")
-    .select("*")
-    .eq("module_id", moduleId)
-    .order("updated_at", { ascending: false });
+  try {
+    const { data, error } = await supabase
+      .from("user_notes")
+      .select("*")
+      .eq("module_id", moduleId)
+      .order("updated_at", { ascending: false });
 
-  if (error) {
-    console.error("Error fetching notes by module:", error);
-    return [];
+    if (error) throw error;
+    return data || [];
+  } catch {
+    return getLocalNotes().filter(n => n.module_id === moduleId);
   }
-  return data || [];
 }
 
 export async function getNoteById(id: string): Promise<Note | null> {
-  const { data, error } = await supabase
-    .from("user_notes")
-    .select("*")
-    .eq("id", id)
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from("user_notes")
+      .select("*")
+      .eq("id", id)
+      .single();
 
-  if (error) {
-    console.error("Error fetching note:", error);
-    return null;
+    if (error) throw error;
+    return data;
+  } catch {
+    const notes = getLocalNotes();
+    return notes.find(n => n.id === id) || null;
   }
-  return data;
 }
 
 export async function createNote(note: Partial<Note>): Promise<Note | null> {
-  const { data, error } = await supabase
-    .from("user_notes")
-    .insert(note)
-    .select()
-    .single();
+  const newNote: Note = {
+    id: generateId(),
+    user_id: note.user_id || "local",
+    title: note.title || "Untitled Note",
+    content: note.content || "",
+    folder_id: note.folder_id || null,
+    module_id: note.module_id || null,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
 
-  if (error) {
-    console.error("Error creating note:", error);
-    return null;
+  try {
+    const { data, error } = await supabase
+      .from("user_notes")
+      .insert(newNote)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.warn("Using local storage for notes (Supabase unavailable)");
+    const notes = getLocalNotes();
+    notes.unshift(newNote);
+    setLocalNotes(notes);
+    return newNote;
   }
-  return data;
 }
 
 export async function updateNote(id: string, updates: Partial<Note>): Promise<Note | null> {
-  const { data, error } = await supabase
-    .from("user_notes")
-    .update({ ...updates, updated_at: new Date().toISOString() })
-    .eq("id", id)
-    .select()
-    .single();
+  const updated = {
+    ...updates,
+    updated_at: new Date().toISOString(),
+  };
 
-  if (error) {
-    console.error("Error updating note:", error);
+  try {
+    const { data, error } = await supabase
+      .from("user_notes")
+      .update(updated)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch {
+    const notes = getLocalNotes();
+    const index = notes.findIndex(n => n.id === id);
+    if (index !== -1) {
+      notes[index] = { ...notes[index], ...updated };
+      setLocalNotes(notes);
+      return notes[index];
+    }
     return null;
   }
-  return data;
 }
 
 export async function deleteNote(id: string): Promise<boolean> {
-  const { error } = await supabase
-    .from("user_notes")
-    .delete()
-    .eq("id", id);
+  try {
+    const { error } = await supabase
+      .from("user_notes")
+      .delete()
+      .eq("id", id);
 
-  if (error) {
-    console.error("Error deleting note:", error);
-    return false;
+    if (error) throw error;
+    return true;
+  } catch {
+    const notes = getLocalNotes();
+    setLocalNotes(notes.filter(n => n.id !== id));
+    return true;
   }
-  return true;
 }
 
 export async function getFolders(): Promise<NoteFolder[]> {
-  const { data, error } = await supabase
-    .from("note_folders")
-    .select("*")
-    .order("name", { ascending: true });
+  try {
+    const { data, error } = await supabase
+      .from("note_folders")
+      .select("*")
+      .order("name", { ascending: true });
 
-  if (error) {
-    console.error("Error fetching folders:", error);
-    return [];
+    if (error) throw error;
+    return data || [];
+  } catch {
+    return getLocalFolders();
   }
-  return data || [];
 }
 
 export async function createFolder(folder: Partial<NoteFolder>): Promise<NoteFolder | null> {
-  const { data, error } = await supabase
-    .from("note_folders")
-    .insert(folder)
-    .select()
-    .single();
+  const newFolder: NoteFolder = {
+    id: generateId(),
+    user_id: folder.user_id || "local",
+    name: folder.name || "New Folder",
+    parent_id: folder.parent_id || null,
+    created_at: new Date().toISOString(),
+  };
 
-  if (error) {
-    console.error("Error creating folder:", error);
-    return null;
+  try {
+    const { data, error } = await supabase
+      .from("note_folders")
+      .insert(newFolder)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch {
+    const folders = getLocalFolders();
+    folders.push(newFolder);
+    setLocalFolders(folders);
+    return newFolder;
   }
-  return data;
 }
 
 export async function updateFolder(id: string, updates: Partial<NoteFolder>): Promise<NoteFolder | null> {
-  const { data, error } = await supabase
-    .from("note_folders")
-    .update(updates)
-    .eq("id", id)
-    .select()
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from("note_folders")
+      .update(updates)
+      .eq("id", id)
+      .select()
+      .single();
 
-  if (error) {
-    console.error("Error updating folder:", error);
+    if (error) throw error;
+    return data;
+  } catch {
+    const folders = getLocalFolders();
+    const index = folders.findIndex(f => f.id === id);
+    if (index !== -1) {
+      folders[index] = { ...folders[index], ...updates };
+      setLocalFolders(folders);
+      return folders[index];
+    }
     return null;
   }
-  return data;
 }
 
 export async function deleteFolder(id: string): Promise<boolean> {
-  const { error } = await supabase
-    .from("note_folders")
-    .delete()
-    .eq("id", id);
+  try {
+    const { error } = await supabase
+      .from("note_folders")
+      .delete()
+      .eq("id", id);
 
-  if (error) {
-    console.error("Error deleting folder:", error);
-    return false;
+    if (error) throw error;
+    return true;
+  } catch {
+    const folders = getLocalFolders();
+    setLocalFolders(folders.filter(f => f.id !== id));
+    return true;
   }
-  return true;
 }

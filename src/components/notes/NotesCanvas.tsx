@@ -32,11 +32,11 @@ export function NotesCanvas({ open, onOpenChange }: NotesCanvasProps) {
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (open && isAuthenticated) {
+    if (open) {
       loadNotes();
       loadFolders();
     }
-  }, [open, isAuthenticated]);
+  }, [open]);
 
   useEffect(() => {
     if (selectedNote) {
