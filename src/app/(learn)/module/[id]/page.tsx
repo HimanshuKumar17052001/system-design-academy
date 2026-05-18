@@ -10,7 +10,6 @@ import { ModuleNotesDownloader } from "@/components/learn/ModuleNotesDownloader"
 import { AITutor } from "@/components/ai-tutor/AITutor";
 import { AITutorProvider } from "@/components/ai-tutor/AITutorContext";
 import { ConceptHighlighter } from "@/components/ai-tutor/ConceptHighlighter";
-import { NotesCanvas } from "@/components/learn/NotesCanvas";
 import { Suspense } from "react";
 
 interface ModulePageProps {
@@ -55,7 +54,6 @@ export default async function ModulePage({ params }: ModulePageProps) {
             </Badge>
           </div>
           <div className="flex items-center gap-2">
-            <NotesCanvas moduleId={module.id} />
             <ModuleNotesDownloader module={module} />
           </div>
         </div>

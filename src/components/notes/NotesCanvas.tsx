@@ -57,20 +57,29 @@ export function NotesCanvas({ open, onOpenChange }: NotesCanvasProps) {
   };
 
   const handleNewNote = async () => {
-    if (!user) return;
-    const newNote = await createNote({
-      user_id: user.id,
-      title: "Untitled Note",
-      content: "",
-      folder_id: null,
-      module_id: null,
-    });
-    if (newNote) {
-      setNotes([newNote, ...notes]);
-      setSelectedNote(newNote);
-      setNoteTitle(newNote.title);
-      setNoteContent(newNote.content);
-      setIsEditing(true);
+    if (!user) {
+      console.warn("Cannot create note: user not authenticated");
+      return;
+    }
+    try {
+      const newNote = await createNote({
+        user_id: user.id,
+        title: "Untitled Note",
+        content: "",
+        folder_id: null,
+        module_id: null,
+      });
+      if (newNote) {
+        setNotes([newNote, ...notes]);
+        setSelectedNote(newNote);
+        setNoteTitle(newNote.title);
+        setNoteContent(newNote.content);
+        setIsEditing(true);
+      } else {
+        console.error("Failed to create note: no data returned");
+      }
+    } catch (error) {
+      console.error("Error creating note:", error);
     }
   };
 
@@ -251,7 +260,7 @@ export function NotesCanvas({ open, onOpenChange }: NotesCanvasProps) {
               {/* Module Sections */}
               <div className="mt-3">
                 <div className="text-xs font-medium text-muted-foreground px-2 mb-1">By Module</div>
-                {modules.slice(0, 8).map(module => {
+                {modules.map(module => {
                   const moduleNotes = notes.filter(n => n.module_id === module.id);
                   return (
                     <button
@@ -408,7 +417,7 @@ export function NotesCanvas({ open, onOpenChange }: NotesCanvasProps) {
                 <div className="p-3 border-t bg-muted/30">
                   <div className="text-xs text-muted-foreground mb-2">Link to module (type @ to search):</div>
                   <div className="flex flex-wrap gap-1">
-                    {modules.slice(0, 6).map(m => (
+                    {modules.map(m => (
                       <Button
                         key={m.id}
                         variant="outline"

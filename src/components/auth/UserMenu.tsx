@@ -33,8 +33,9 @@ export function UserMenu() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     setDropdownOpen(false);
+    await signOut();
     router.replace("/");
   };
 
