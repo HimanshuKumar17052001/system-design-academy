@@ -438,15 +438,6 @@ export default function LandingPage() {
                   <ArrowRight className="size-4" />
                 </Button>
               )}
-              <a
-                href="https://github.com/HimanshuKumar17052001/system-design-academy"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button size="lg" variant="outline" className="text-base">
-                  View on GitHub
-                </Button>
-              </a>
             </motion.div>
             <motion.div
               className="mt-8 flex items-center justify-center gap-6 text-sm text-muted-foreground"
@@ -707,16 +698,7 @@ export default function LandingPage() {
       <footer className="border-t py-8">
         <div className="mx-auto max-w-6xl px-4 text-center text-sm text-muted-foreground md:px-6">
           <p>
-            Built with Next.js, Supabase, and shadcn/ui. Open source on{" "}
-            <a
-              href="https://github.com/HimanshuKumar17052001/system-design-academy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-            >
-              GitHub
-            </a>
-            .
+            Built with Next.js, Supabase, and shadcn/ui.
           </p>
         </div>
       </footer>

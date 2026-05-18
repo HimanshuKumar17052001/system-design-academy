@@ -40,8 +40,7 @@ export function UserMenu() {
     } catch (error) {
       console.error("Sign out error:", error);
     }
-    router.replace("/");
-    window.location.reload();
+    window.location.href = "/";
   };
 
   const handleThemeToggle = () => {
