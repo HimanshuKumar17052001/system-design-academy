@@ -7,6 +7,7 @@ import { AuthProvider } from "@/components/auth/AuthProvider";
 import { ThemeProvider } from "@/components/shared/ThemeProvider";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { NotesProvider } from "@/components/notes/NotesProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -44,9 +45,11 @@ export default function RootLayout({
           <AuthProvider>
             <TooltipProvider>
               <ProgressProvider>
-                {children}
-                <Analytics />
-                <SpeedInsights />
+                <NotesProvider>
+                  {children}
+                  <Analytics />
+                  <SpeedInsights />
+                </NotesProvider>
               </ProgressProvider>
             </TooltipProvider>
           </AuthProvider>

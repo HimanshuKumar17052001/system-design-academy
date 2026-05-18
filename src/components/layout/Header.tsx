@@ -10,6 +10,7 @@ import {
   Clock,
   BookOpen,
   Search,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,7 @@ import { useProgressStore } from "@/lib/progress";
 import { modules } from "@/data/curriculum";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { GlobalSearch } from "@/components/shared/GlobalSearch";
+import { useNotesCanvas } from "@/components/notes/NotesProvider";
 
 interface HeaderProps {
   onMenuToggle: () => void;
@@ -33,6 +35,7 @@ interface HeaderProps {
 export function Header({ onMenuToggle }: HeaderProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const router = useRouter();
+  const { setOpen: setNotesOpen } = useNotesCanvas();
   const completedModules = useProgressStore((s) => s.completedModules);
   const totalStudyTimeMinutes = useProgressStore(
     (s) => s.totalStudyTimeMinutes
@@ -130,6 +133,17 @@ export function Header({ onMenuToggle }: HeaderProps) {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setNotesOpen(true)}
+          className="gap-1.5 text-xs"
+          title="Notes (Cmd+N)"
+        >
+          <FileText className="size-3.5" />
+          <span className="hidden sm:inline">Notes</span>
+        </Button>
 
         <UserMenu />
       </div>
