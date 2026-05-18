@@ -36,7 +36,7 @@ export function NotesCanvas({ open, onOpenChange }: NotesCanvasProps) {
       loadNotes();
       loadFolders();
     }
-  }, [open]);
+  }, [open, isAuthenticated]);
 
   useEffect(() => {
     if (selectedNote) {
@@ -458,18 +458,18 @@ export function useNotesCanvas() {
 
   useEffect(() => {
     const handleOpen = (newOpen: boolean) => {
-      notesCanvasOpen = newOpen;
       setOpen(newOpen);
-      listeners.forEach(fn => fn(newOpen));
     };
 
     listeners.add(handleOpen);
     return () => { listeners.delete(handleOpen); };
   }, []);
 
-  return { open, setOpen: (o: boolean) => { 
-    notesCanvasOpen = o; 
-    setOpen(o); 
+  const handleSetOpen = (o: boolean) => {
+    notesCanvasOpen = o;
+    setOpen(o);
     listeners.forEach(fn => fn(o));
-  }};
+  };
+
+  return { open, setOpen: handleSetOpen };
 }
