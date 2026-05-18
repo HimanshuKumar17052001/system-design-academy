@@ -219,7 +219,8 @@ function PhaseCard({ phase, index }: { phase: typeof phases[0]; index: number })
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
+      whileHover={{ scale: 1.02, y: -4 }}
+      transition={{ delay: index * 0.05, duration: 0.2 }}
       className="group relative cursor-pointer"
       style={{ perspective: "1000px" }}
       onClick={() => isMobile && setFlipped(!flipped)}
@@ -370,6 +371,18 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden border-b">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5" />
+        <motion.div
+          className="absolute inset-0 opacity-60"
+          animate={{
+            background: [
+              "radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.15) 0%, transparent 50%)",
+              "radial-gradient(ellipse at 80% 50%, rgba(168,85,247,0.12) 0%, transparent 50%)",
+              "radial-gradient(ellipse at 50% 80%, rgba(99,102,241,0.1) 0%, transparent 50%)",
+              "radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.15) 0%, transparent 50%)",
+            ],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+        />
         <div className="relative mx-auto max-w-6xl px-4 py-24 md:px-6 lg:py-32">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -377,20 +390,41 @@ export default function LandingPage() {
             transition={{ duration: 0.5 }}
             className="text-center"
           >
-            <Badge variant="secondary" className="mb-6 text-sm">
-              53 Modules · 25 Simulations · 100% Free
-            </Badge>
-            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.4 }}
+            >
+              <Badge variant="secondary" className="mb-6 text-sm">
+                53 Modules · 25 Simulations · 100% Free
+              </Badge>
+            </motion.div>
+            <motion.h1
+              className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
               Master System
               <br />
               <span className="text-primary">Design & Architecture</span>
-            </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
+            </motion.h1>
+            <motion.p
+              className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
               From HTTP fundamentals to designing Uber and Twitter at scale.
               Interactive lessons, hands-on labs, and real-world case studies for
               your next system design interview.
-            </p>
-            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            </motion.p>
+            <motion.div
+              className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
               {isAuthenticated ? (
                 <Link href="/dashboard">
                   <Button size="lg" className="gap-2 text-base">
@@ -413,8 +447,13 @@ export default function LandingPage() {
                   View on GitHub
                 </Button>
               </a>
-            </div>
-            <div className="mt-8 flex items-center justify-center gap-6 text-sm text-muted-foreground">
+            </motion.div>
+            <motion.div
+              className="mt-8 flex items-center justify-center gap-6 text-sm text-muted-foreground"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.4 }}
+            >
               <div className="flex items-center gap-1.5">
                 <CheckCircle className="size-4 text-emerald-500" />
                 <span>Beginner to Advanced</span>
@@ -427,7 +466,7 @@ export default function LandingPage() {
                 <CheckCircle className="size-4 text-emerald-500" />
                 <span>Certificate Included</span>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
@@ -445,8 +484,9 @@ export default function LandingPage() {
               <motion.div
                 key={stat.label}
                 initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ delay: i * 0.1, duration: 0.4 }}
                 className="text-center"
               >
                 <div className="text-3xl font-bold text-foreground md:text-4xl">
@@ -489,14 +529,20 @@ export default function LandingPage() {
       {/* Features */}
       <section className="border-y py-20">
         <div className="mx-auto max-w-6xl px-4 md:px-6">
-          <div className="mb-12 text-center">
+          <motion.div
+            className="mb-12 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5 }}
+          >
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
               Why This Platform?
             </h2>
             <p className="mt-4 text-muted-foreground">
               Designed for engineers who want to ace system design interviews
             </p>
-          </div>
+          </motion.div>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((feature, i) => {
               const Icon = feature.icon;
@@ -504,19 +550,24 @@ export default function LandingPage() {
                 <motion.div
                   key={feature.title}
                   initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ delay: i * 0.08, duration: 0.4 }}
                   className="flex flex-col gap-3"
                 >
-                  <div className="w-fit rounded-lg bg-primary/10 p-2.5">
+                  <motion.div
+                    className="w-fit rounded-lg bg-primary/10 p-2.5"
+                    whileHover={{ scale: 1.05, backgroundColor: "rgba(99, 102, 241, 0.15)" }}
+                    transition={{ duration: 0.2 }}
+                  >
                     <Icon className="size-5 text-primary" />
-                  </div>
+                  </motion.div>
                   <h3 className="font-semibold">{feature.title}</h3>
                   <p className="text-sm text-muted-foreground">
                     {feature.description}
                   </p>
                 </motion.div>
-              );
+);
             })}
           </div>
         </div>
@@ -527,8 +578,9 @@ export default function LandingPage() {
         <div className="mx-auto max-w-4xl px-4 text-center md:px-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5 }}
           >
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
               Ready to Master System Design?
