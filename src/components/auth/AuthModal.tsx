@@ -68,7 +68,6 @@ export function AuthModal({ open: controlledOpen, onOpenChange }: AuthModalProps
       handleOpenChange(false);
       setSignInEmail("");
       setSignInPassword("");
-      router.push("/dashboard");
     }
 
     setSignInLoading(false);
@@ -95,7 +94,6 @@ export function AuthModal({ open: controlledOpen, onOpenChange }: AuthModalProps
       setSignUpConfirmPassword("");
       setSignUpFullName("");
       setActiveTab("signin");
-      router.push("/dashboard");
     }
 
     setSignUpLoading(false);
