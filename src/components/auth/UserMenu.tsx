@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, BarChart3, User, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
+import { useProgressStore } from "@/lib/progress";
 
 function getInitials(name: string) {
   return name
@@ -40,7 +41,8 @@ export function UserMenu() {
     } catch (error) {
       console.error("Sign out error:", error);
     }
-    router.push("/");
+    useProgressStore.getState().resetProgress();
+    window.location.href = "/";
   };
 
   const handleThemeToggle = () => {

@@ -321,49 +321,50 @@ function ThemeToggle() {
 }
 
 export default function LandingPage() {
-  const { isAuthenticated } = useAuth();
   const router = useRouter();
+  const { isAuthenticated, loading } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
   const [contactForm, setContactForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [contactStatus, setContactStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const shouldReduceMotion = useRef(false);
-  useEffect(() => {
-    shouldReduceMotion.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  }, []);
 
+  const heroRef = useRef<HTMLDivElement>(null);
+  const statsRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useRef(false);
+
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const yBadge = useTransform(scrollYProgress, [0, 1], [0, -60]);
   const yTitle = useTransform(scrollYProgress, [0, 1], [0, -80]);
   const ySubtitle = useTransform(scrollYProgress, [0, 1], [0, -40]);
   const yButton = useTransform(scrollYProgress, [0, 1], [0, -20]);
   const yPills = useTransform(scrollYProgress, [0, 1], [0, -30]);
-
   const opacityBadge = useTransform(scrollYProgress, [0, 0.7], [1, 0.2]);
   const opacityTitle = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
   const opacitySubtitle = useTransform(scrollYProgress, [0, 0.8], [1, 0.3]);
   const opacityButton = useTransform(scrollYProgress, [0, 0.85], [1, 0.5]);
   const opacityPills = useTransform(scrollYProgress, [0, 1], [1, 0]);
 
-  const statsRef = useRef<HTMLDivElement>(null);
   const statsScrollYProgress = useScroll({ target: statsRef, offset: ["start end", "end start"] }).scrollYProgress;
   const statsY0 = useTransform(statsScrollYProgress, [0, 1], [0, -30]);
   const statsY1 = useTransform(statsScrollYProgress, [0, 1], [0, -20]);
   const statsY2 = useTransform(statsScrollYProgress, [0, 1], [0, -10]);
   const statsY3 = useTransform(statsScrollYProgress, [0, 1], [0, 0]);
 
-  const ctaRef = useRef<HTMLDivElement>(null);
   const ctaScrollYProgress = useScroll({ target: ctaRef, offset: ["start end", "end start"] }).scrollYProgress;
   const ctaYHeading = useTransform(ctaScrollYProgress, [0, 1], [0, -40]);
   const ctaYSubtitle = useTransform(ctaScrollYProgress, [0, 1], [0, -30]);
   const ctaYButton = useTransform(ctaScrollYProgress, [0, 1], [0, -15]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    shouldReduceMotion.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }, []);
+
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
       router.replace("/dashboard");
     }
-  }, [isAuthenticated, router]);
+  }, [loading, isAuthenticated, router]);
 
   const handleStartLearning = () => {
     if (!isAuthenticated) {

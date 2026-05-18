@@ -133,7 +133,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [supabase]);
 
   const signOut = useCallback(async () => {
+    const { resetProgress } = useProgressStore.getState();
     await supabase.auth.signOut();
+    resetProgress();
   }, [supabase]);
 
   const isAuthenticated = !!user;
