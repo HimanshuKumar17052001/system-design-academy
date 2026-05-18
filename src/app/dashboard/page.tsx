@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import {
   BookOpen,
   Globe,
@@ -27,6 +29,7 @@ import { modules } from "@/data/curriculum";
 import type { ModuleCategory } from "@/types/curriculum";
 import { AppShell } from "@/components/layout/AppShell";
 import { ProgressTips } from "@/components/ai-tutor/ProgressTips";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 const categoryMeta: Record<
   ModuleCategory,
@@ -123,10 +126,18 @@ function CircularProgress({
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const completedModules = useProgressStore((s) => s.completedModules);
   const lastVisited = useProgressStore((s) => s.lastVisited);
   const totalStudyTimeMinutes = useProgressStore((s) => s.totalStudyTimeMinutes);
   const getModuleStatus = useProgressStore((s) => s.getModuleStatus);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace("/");
+    }
+  }, [isAuthenticated, router]);
 
   const totalModules = modules.length;
   const completedCount = completedModules.length;
