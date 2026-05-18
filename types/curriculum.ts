@@ -41,7 +41,8 @@ export type ContentBlock =
   | { type: "callout"; variant: "info" | "warning" | "tip" | "success"; content: string }
   | { type: "formula"; expression: string; explanation: string }
   | { type: "bullets"; items: string[] }
-  | { type: "table"; headers: string[]; rows: string[][]; caption?: string };
+  | { type: "table"; headers: string[]; rows: string[][]; caption?: string }
+  | { type: "video-embed"; url?: string; title: string; duration: string; thumbnail?: string };
 
 export type DiagramKind =
   | "request-flow"

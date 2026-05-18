@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Circle, BookOpen } from "lucide-react";
+import { CheckCircle2, Circle, BookOpen, Play } from "lucide-react";
 import { MermaidDiagram } from "./MermaidDiagram";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +16,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useProgressStore } from "@/lib/progress";
 import type { Lesson, ContentBlock } from "@/types/curriculum";
@@ -203,6 +208,40 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
           <p className="mt-2 text-xs text-muted-foreground">
             This interactive component will be loaded here.
           </p>
+        </motion.div>
+      );
+
+    case "video-embed":
+      return (
+        <motion.div variants={itemVariants}>
+          <div className="relative rounded-xl border border-dashed border-muted-foreground/20 overflow-hidden bg-gradient-to-br from-muted/30 to-muted/10">
+            <div className="aspect-video flex flex-col items-center justify-center p-8">
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="relative flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 border-2 border-primary/30 cursor-not-allowed">
+                      <Play className="w-6 h-6 text-primary ml-1" fill="currentColor" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    Available soon
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            </div>
+            <div className="flex items-center justify-between px-4 py-3 border-t border-dashed border-muted-foreground/20">
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium">{block.title}</span>
+                <Badge variant="secondary" className="text-xs">
+                  {block.duration}
+                </Badge>
+              </div>
+            </div>
+            <div className="px-4 py-2 bg-muted/50 text-center">
+              <span className="text-xs text-muted-foreground">Video content coming soon</span>
+            </div>
+          </div>
         </motion.div>
       );
 

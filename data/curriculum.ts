@@ -41,6 +41,12 @@ export const modules: Module[] = [
               "A well-designed system is assembled from well-understood building blocks — load balancers, caches, queues, databases, CDNs — connected by clear data flows. The skill lies in choosing the right blocks, sizing them correctly, and understanding the trade-offs each choice introduces.",
           },
           {
+            type: "video-embed",
+            url: "",
+            title: "Introduction to System Design",
+            duration: "8:30",
+          },
+          {
             type: "bullets",
             items: [
               "High-Level Design (HLD): Focuses on architecture, scalability, and component interaction.",
@@ -159,6 +165,36 @@ export const modules: Module[] = [
               "The cycle starts when a user enters a URL or clicks a link. The browser constructs an HTTP request, resolves the domain via DNS, opens a TCP connection, sends the request, and waits for the server to respond.",
           },
           {
+            type: "mermaid",
+            title: "HTTP Request/Response Flow",
+            caption: "Full request lifecycle from browser to server and back",
+            code: `flowchart TD
+    A[Browser] --> B{DNS Lookup}
+    B --> C[Cache Hit?]
+    C -->|Yes| D[Return IP]
+    C -->|No| E[Recursive Resolver]
+    E --> F[Root Server]
+    F --> G[TLD Server]
+    G --> H[Authoritative Server]
+    H --> D
+    D --> I[TCP Handshake<br/>SYN → SYN-ACK → ACK]
+    I --> J[TLS Handshake<br/>Certificate + Key Exchange]
+    J --> K[HTTP Request<br/>GET /api/users HTTP/1.1]
+    K --> L[Load Balancer]
+    L --> M[Web Server]
+    M --> N[Application Server]
+    N --> O[(Database)]
+    N --> P[(Cache<br/>Redis)]
+    O --> Q[Response Assembly]
+    P --> Q
+    Q --> R[HTTP Response<br/>200 OK + JSON]
+    R --> A
+    
+    style A fill:#3b82f6,stroke:#2563eb,color:#fff
+    style O fill:#f59e0b,stroke:#d97706,color:#fff
+    style P fill:#10b981,stroke:#059669,color:#fff`,
+          },
+          {
             type: "bullets",
             items: [
               "DNS Resolution: domain.com → 203.0.113.45 (cached at multiple levels)",
@@ -264,6 +300,26 @@ export const modules: Module[] = [
               "The Domain Name System (DNS) is the phonebook of the internet. When you type google.com, DNS translates that human-readable name into an IP address.",
           },
           {
+            type: "mermaid",
+            title: "DNS Resolution Steps",
+            caption: "Recursive resolution path from browser to authoritative nameserver",
+            code: `flowchart LR
+    A[Browser] --> B[Browser DNS<br/>Cache]
+    B -->|miss| C[OS DNS<br/>Cache]
+    C -->|miss| D[Recursive<br/>Resolver<br/>8.8.8.8]
+    D --> E[Root Nameserver<br/>.] 
+    E --> F[TLD Server<br/>.com]
+    F --> G[Authoritative<br/>Nameserver<br/>google.com]
+    G --> D
+    D --> H[IP Address<br/>142.250.185.46]
+    H --> A
+    
+    style A fill:#3b82f6,stroke:#2563eb,color:#fff
+    style D fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    style G fill:#10b981,stroke:#059669,color:#fff
+    style H fill:#f59e0b,stroke:#d97706,color:#fff`,
+          },
+          {
             type: "bullets",
             items: [
               "Browser cache → OS cache → Recursive resolver → Root server → TLD server → Authoritative server",
@@ -287,6 +343,26 @@ export const modules: Module[] = [
             type: "text",
             content:
               "A CDN caches static assets (images, CSS, JS) at edge locations geographically close to users. This reduces latency and offloads the origin server.",
+          },
+          {
+            type: "mermaid",
+            title: "CDN Caching Strategy",
+            caption: "Cache hierarchy from user to origin with hit/miss flows",
+            code: `flowchart TD
+    A[User<br/>Mumbai] --> B[Edge POP<br/>Mumbai<br/>Cache Hit?]
+    B -->|HIT| C[Return<br/>Cached<br/>~10-30ms]
+    B -->|MISS| D[Origin Shield<br/>US-East<br/>Cache Hit?]
+    D -->|HIT| E[Return<br/>Cached<br/>~50-100ms]
+    D -->|MISS| F[Origin Server<br/>Virginia]
+    F -->|First Request| G[(Cache at<br/>Edge POP)]
+    G --> E
+    F -->|First Request| H[(Cache at<br/>Origin Shield)]
+    H --> E
+    
+    style A fill:#3b82f6,stroke:#2563eb,color:#fff
+    style C fill:#10b981,stroke:#059669,color:#fff
+    style E fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    style F fill:#f59e0b,stroke:#d97706,color:#fff`,
           },
           {
             type: "bullets",
@@ -442,6 +518,12 @@ export const modules: Module[] = [
               "SQL databases store data in tables with predefined schemas. They guarantee ACID properties, making them ideal for transactions where correctness is critical.",
           },
           {
+            type: "video-embed",
+            url: "",
+            title: "Introduction to SQL Databases",
+            duration: "12:45",
+          },
+          {
             type: "bullets",
             items: [
               "Atomicity: All operations in a transaction succeed or all are rolled back.",
@@ -571,6 +653,37 @@ export const modules: Module[] = [
             type: "text",
             content:
               "Horizontal scaling means adding more machines to distribute the load. It is the only way to reach web scale, but it introduces distributed system complexity.",
+          },
+          {
+            type: "video-embed",
+            url: "",
+            title: "Horizontal Scaling Explained",
+            duration: "7:20",
+          },
+          {
+            type: "mermaid",
+            title: "Load Balancer Algorithms",
+            caption: "Four common algorithms for distributing incoming traffic",
+            code: `flowchart LR
+    A[Clients] --> B[Load Balancer]
+    B --> C1[Server 1]
+    B --> C2[Server 2]
+    B --> C3[Server 3]
+    B --> C4[Server N]
+    
+    subgraph Round Robin
+    B1[LB] -->|1st| S1[Server 1]
+    B1 -->|2nd| S2[Server 2]
+    B1 -->|3rd| S3[Server 3]
+    B1 -->|4th| S4[Server 4]
+    B1 -->|5th| S1
+    end
+    
+    style B fill:#3b82f6,stroke:#2563eb,color:#fff
+    style C1 fill:#10b981,stroke:#059669,color:#fff
+    style C2 fill:#10b981,stroke:#059669,color:#fff
+    style C3 fill:#10b981,stroke:#059669,color:#fff
+    style C4 fill:#10b981,stroke:#059669,color:#fff`,
           },
           {
             type: "bullets",

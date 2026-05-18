@@ -75,6 +75,9 @@ const TwitterCase = dynamic(
 const UberCase = dynamic(
   () => import("@/components/simulations/UberCase")
 );
+const WhatsAppCase = dynamic(
+  () => import("@/components/simulations/WhatsAppCase")
+);
 const DeploymentVisualizer = dynamic(
   () => import("@/components/simulations/DeploymentVisualizer")
 );
@@ -223,6 +226,8 @@ export default function LabRunner({ lab, onComplete }: LabRunnerProps) {
             return <TwitterCase />;
           case "uber-lab":
             return <UberCase />;
+          case "whatsapp-lab":
+            return <WhatsAppCase />;
           default:
             return (
               <div className="rounded-lg border p-8 text-center text-muted-foreground">
