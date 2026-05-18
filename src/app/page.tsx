@@ -345,9 +345,15 @@ export default function LandingPage() {
   const statsRef = useRef<HTMLDivElement>(null);
   const statsScrollYProgress = useScroll({ target: statsRef, offset: ["start end", "end start"] }).scrollYProgress;
   const statsY0 = useTransform(statsScrollYProgress, [0, 1], [0, -30]);
-  const statsY1 = useTransform(statsScrollYProgress, [0, 1], [0, -30]);
-  const statsY2 = useTransform(statsScrollYProgress, [0, 1], [0, -30]);
-  const statsY3 = useTransform(statsScrollYProgress, [0, 1], [0, -30]);
+  const statsY1 = useTransform(statsScrollYProgress, [0, 1], [0, -20]);
+  const statsY2 = useTransform(statsScrollYProgress, [0, 1], [0, -10]);
+  const statsY3 = useTransform(statsScrollYProgress, [0, 1], [0, 0]);
+
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const ctaScrollYProgress = useScroll({ target: ctaRef, offset: ["start end", "end start"] }).scrollYProgress;
+  const ctaYHeading = useTransform(ctaScrollYProgress, [0, 1], [0, -40]);
+  const ctaYSubtitle = useTransform(ctaScrollYProgress, [0, 1], [0, -30]);
+  const ctaYButton = useTransform(ctaScrollYProgress, [0, 1], [0, -15]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -594,7 +600,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20">
+      <section ref={ctaRef} className="py-20">
         <div className="mx-auto max-w-4xl px-4 text-center md:px-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -602,14 +608,14 @@ export default function LandingPage() {
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+            <motion.h2 style={{ y: ctaYHeading }} className="text-3xl font-bold tracking-tight md:text-4xl">
               Ready to Master System Design?
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
+            </motion.h2>
+            <motion.p style={{ y: ctaYSubtitle }} className="mx-auto mt-4 max-w-xl text-muted-foreground">
               Start with Module 1 and work your way through 53 interactive modules.
               Your certificate awaits at the finish line.
-            </p>
-            <div className="mt-8">
+            </motion.p>
+            <motion.div style={{ y: ctaYButton }} className="mt-8">
               {isAuthenticated ? (
                 <Link href="/dashboard">
                   <Button size="lg" className="gap-2 text-base">
@@ -623,7 +629,7 @@ export default function LandingPage() {
                   <ArrowRight className="size-4" />
                 </Button>
               )}
-            </div>
+            </motion.div>
             <p className="mt-4 text-xs text-muted-foreground">
               Free forever. No credit card required.
             </p>
