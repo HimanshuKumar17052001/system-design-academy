@@ -182,6 +182,23 @@ export const phase3Modules: Module[] = [
             variant: "warning",
             content: "Cache invalidation is hardest in distributed systems with multiple cache nodes. A lost invalidation message leaves stale data until TTL expires. Always use TTL as a safety net, even with explicit invalidation.",
           },
+          {
+            type: "table",
+            headers: ["Pattern", "Description", "Use Case"],
+            rows: [
+              ["Cache-aside", "App checks cache first, falls back to DB on miss", "Read-heavy, low write"],
+              ["Read-through", "Cache automatically loads from DB on miss", "Simple, predictable reads"],
+              ["Write-through", "Write to cache and DB simultaneously", "Durability critical"],
+              ["Write-back", "Write to cache only, DB async", "Write-heavy, risk of loss"],
+              ["Refresh-ahead", "Proactively refresh expiring entries", "Low-latency requirements"]
+            ],
+            caption: "Common caching patterns"
+          },
+          {
+            type: "callout",
+            variant: "warning",
+            content: "Cache Stampede: When cache expires, multiple requests hit DB simultaneously. Mitigate with probabilistic early expiration, lock-based serialization, or background refresh."
+          }
         ],
       },
     ],
@@ -417,17 +434,42 @@ export const phase3Modules: Module[] = [
             type: "text",
             content: "Backpressure is the mechanism by which a consumer signals to a producer that it is overwhelmed and cannot keep up. Without backpressure, queues grow unbounded and eventually cause out-of-memory crashes.",
           },
-          {
-            type: "bullets",
-            items: [
-              "Reactive Streams (RxJava, Project Reactor): Standardized backpressure protocol (request N items at a time).",
-              "Kafka: Consumers control fetch rate. If lag grows, add more consumer instances to a partition group.",
-              "RabbitMQ: Prefetch count limits unacknowledged messages per consumer.",
-              "SQS: Visibility timeout + maxReceiveCount + dead-letter queue for poison pills.",
-            ],
-          },
-        ],
-      },
+{
+              type: "bullets",
+              items: [
+                "Reactive Streams (RxJava, Project Reactor): Standardized backpressure protocol (request N items at a time).",
+                "Kafka: Consumers control fetch rate. If lag grows, add more consumer instances to a partition group.",
+                "RabbitMQ: Prefetch count limits unacknowledged messages per consumer.",
+                "SQS: Visibility timeout + maxReceiveCount + dead-letter queue for poison pills.",
+              ],
+            },
+            {
+              type: "table",
+              headers: ["Pattern", "Best For", "Trade-off"],
+              rows: [
+                ["Point-to-Point", "Task workers, job queues", "No broadcast, single consumer"],
+                ["Pub/Sub", "Event streaming, notifications", "Unconsumed messages lost"],
+                ["Priority Queue", "Urgent tasks first", "Starvation of low priority"],
+                ["Delayed Queue", "Scheduled tasks", "Added complexity"]
+              ],
+              caption: "Message queue patterns"
+            },
+            {
+              type: "bullets",
+              items: [
+                "Backpressure: When consumers are overwhelmed, pause producers. RabbitMQ with prefetch count, Kafka with consumer lag monitoring.",
+                "Idempotency: Design message handlers to handle duplicate messages safely (use message IDs, transactional outbox pattern).",
+                "Dead Letter Queue: Failed messages go to DLQ for inspection/retry rather than blocking the main queue.",
+                "Ordering Guarantees: FIFO only within a partition/shard. For global ordering, you'll need a single partition or sequence numbers."
+              ]
+            },
+            {
+              type: "callout",
+              variant: "info",
+              content: "Event Sourcing: Store events as the source of truth instead of current state. Enables replay, temporal queries, and decoupled consumers. Challenge: eventual consistency and event schema evolution."
+            }
+          ],
+        },
     ],
     lab: {
       id: "mq-visualizer-lab",
