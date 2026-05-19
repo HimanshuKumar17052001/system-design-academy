@@ -1,5 +1,6 @@
 import type { Module } from "@/types/curriculum";
 import { sampleQuiz } from "./quizzes/sample-quiz";
+import { primerModules } from "./curriculum-primer-modules";
 import { phase2Modules } from "./curriculum-phase2";
 import { phase3Modules } from "./curriculum-phase3";
 import { phase4Modules } from "./curriculum-phase4";
@@ -883,6 +884,7 @@ export const modules: Module[] = [
       type: "text",
     },
   },
+  ...primerModules,
   ...phase2Modules,
   ...phase3Modules,
   ...phase4Modules,
