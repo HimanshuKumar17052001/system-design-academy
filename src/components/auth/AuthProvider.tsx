@@ -134,6 +134,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     const { resetProgress } = useProgressStore.getState();
+    try {
+      await fetch("/api/auth/sign-out", { method: "POST" });
+    } catch (e) {
+      console.error("Sign-out API error:", e);
+    }
     await supabase.auth.signOut();
     resetProgress();
   }, [supabase]);
