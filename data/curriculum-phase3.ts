@@ -53,28 +53,46 @@ export const phase3Modules: Module[] = [
           },
         ],
       },
-      {
-        id: "l16-layers",
-        title: "Layer 4 vs Layer 7",
-        content: [
-          {
-            type: "text",
-            content: "Load balancers operate at different layers of the OSI model, each with different capabilities and performance characteristics.",
-          },
-          {
-            type: "table",
-            headers: ["Feature", "Layer 4 (Transport)", "Layer 7 (Application)"],
-            rows: [
-              ["OSI Layer", "Transport (TCP/UDP)", "Application (HTTP)"],
-              ["Routing based on", "IP + port", "URL, header, cookie, body content"],
-              ["Performance", "Faster (no packet inspection)", "Slower (terminates TLS, parses HTTP)"],
-              ["SSL/TLS", "Passes through (TCP proxy)", "Terminates and re-encrypts"],
-              ["Use case", "TCP services, databases, gaming", "Web apps, API gateways, microservices"],
-              ["Examples", "HAProxy (mode tcp), AWS NLB", "NGINX, AWS ALB, Envoy"],
-            ],
-          },
-        ],
-      },
+{
+          id: "l16-layers",
+          title: "Layer 4 vs Layer 7",
+          content: [
+            {
+              type: "text",
+              content: "Load balancers operate at different layers of the OSI model, each with different capabilities and performance characteristics.",
+            },
+            {
+              type: "table",
+              headers: ["Feature", "Layer 4 (Transport)", "Layer 7 (Application)"],
+              rows: [
+                ["OSI Layer", "Transport (TCP/UDP)", "Application (HTTP)"],
+                ["Routing based on", "IP + port", "URL, header, cookie, body content"],
+                ["Performance", "Faster (no packet inspection)", "Slower (terminates TLS, parses HTTP)"],
+                ["SSL/TLS", "Passes through (TCP proxy)", "Terminates and re-encrypts"],
+                ["Use case", "TCP services, databases, gaming", "Web apps, API gateways, microservices"],
+                ["Examples", "HAProxy (mode tcp), AWS NLB", "NGINX, AWS ALB, Envoy"],
+              ],
+            },
+            {
+              type: "table",
+              headers: ["Layer", "What it routes", "Examples"],
+              rows: [
+                ["Layer 4 (Transport)", "IP address + TCP/UDP port", "HAProxy TCP, AWS NLB"],
+                ["Layer 7 (Application)", "HTTP URLs, headers, content", "HAProxy HTTP, AWS ALB, Nginx"],
+              ],
+              caption: "Load balancer layers",
+            },
+            {
+              type: "bullets",
+              items: [
+                "Active-Passive Failover: Only active handles traffic. Passive takes over on failure. Heartbeats detect failure.",
+                "Active-Active Failover: Both servers handle traffic. DNS routes to both. Requires session persistence.",
+                "SSL Termination: Load balancer decrypts SSL, forwards plain HTTP to backend. Reduces backend CPU load.",
+                "Session Persistence: Cookie-based routing ensures a user's requests go to the same server instance.",
+              ],
+            },
+          ],
+        },
     ],
     lab: {
       id: "lb-simulator-lab",

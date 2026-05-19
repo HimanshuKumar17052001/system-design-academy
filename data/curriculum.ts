@@ -54,6 +54,32 @@ export const modules: Module[] = [
               "In practice, you start with HLD to establish the blueprint, then move to LLD for implementation specifics.",
             ],
           },
+          {
+            type: "callout",
+            variant: "info",
+            content: "DNS Hierarchy: Client → ISP DNS → Root DNS → TLD DNS → Authoritative DNS. Each level caches results with TTL.",
+          },
+          {
+            type: "bullets",
+            items: [
+              "DNS Record Types: A (address), CNAME (canonical), MX (mail exchange), NS (name server)",
+              "DNS Resolution Flow: recursive resolver → root → TLD → authoritative server",
+              "CDN Benefits: Reduces latency, offloads origin servers, provides DDoS protection",
+              "Push CDN: Content uploaded once when changed. Best for static, infrequently updated content.",
+              "Pull CDN: Content fetched on first request, cached until TTL expires. Best for high-traffic content.",
+            ],
+          },
+          {
+            type: "table",
+            headers: ["DNS Record", "Purpose", "Example"],
+            rows: [
+              ["A", "Points hostname to IPv4 address", "www.example.com → 93.184.216.34"],
+              ["CNAME", "Points hostname to another hostname", "www.example.com → example.com"],
+              ["MX", "Mail server for domain", "example.com → mail.example.com"],
+              ["NS", "Authoritative DNS servers", "example.com → ns1.example.com"],
+            ],
+            caption: "Common DNS record types",
+          },
         ],
       },
       {
