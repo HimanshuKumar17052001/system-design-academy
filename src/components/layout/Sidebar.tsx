@@ -15,6 +15,7 @@ import {
   Play,
   ChevronRight,
   PanelLeft,
+  Rocket,
   type LucideIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +48,7 @@ const categoryLabels: Record<ModuleCategory, string> = {
   "real-world-systems": "Real-World",
   "expert-topics": "Expert",
   "interview-prep": "Interview",
+  "case-studies": "Case Studies",
 };
 
 const categoryOrder: ModuleCategory[] = [
@@ -58,6 +60,7 @@ const categoryOrder: ModuleCategory[] = [
   "real-world-systems",
   "expert-topics",
   "interview-prep",
+  "case-studies",
 ];
 
 const categoryIcons: Record<ModuleCategory, LucideIcon> = {
@@ -69,6 +72,7 @@ const categoryIcons: Record<ModuleCategory, LucideIcon> = {
   "real-world-systems": TrendingUp,
   "expert-topics": Calculator,
   "interview-prep": Play,
+  "case-studies": Rocket,
 };
 
 const difficultyColor: Record<Difficulty, string> = {

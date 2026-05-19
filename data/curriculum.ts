@@ -8,6 +8,7 @@ import { phase5Modules } from "./curriculum-phase5";
 import { phase6Modules } from "./curriculum-phase6";
 import { phase7Modules } from "./curriculum-phase7";
 import { phase8Modules } from "./curriculum-phase8";
+import { caseStudyModules } from "./curriculum-case-studies";
 
 export const modules: Module[] = [
   {
@@ -892,6 +893,7 @@ export const modules: Module[] = [
   ...phase6Modules,
   ...phase7Modules,
   ...phase8Modules,
+  ...caseStudyModules,
 ];
 
 export const getModuleById = (id: string): Module | undefined =>

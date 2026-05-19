@@ -75,6 +75,11 @@ const categoryMeta: Record<
     icon: MessageSquareCode,
     gradient: "from-lime-500/20 to-green-500/20",
   },
+  "case-studies": {
+    label: "Case Studies",
+    icon: Rocket,
+    gradient: "from-amber-500/20 to-orange-500/20",
+  },
 };
 
 function CircularProgress({

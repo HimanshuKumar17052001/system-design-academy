@@ -12,6 +12,7 @@ import {
   Circle,
   Lock,
   Play,
+  Rocket,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,6 +37,7 @@ const categoryMeta: Record<
   "real-world-systems": { label: "Real-World", icon: BookOpen },
   "expert-topics": { label: "Expert", icon: BookOpen },
   "interview-prep": { label: "Interview", icon: BookOpen },
+  "case-studies": { label: "Case Studies", icon: Rocket },
 };
 
 function CircularProgress({

@@ -8,7 +8,8 @@ export type ModuleCategory =
   | "reliability-ops"
   | "real-world-systems"
   | "expert-topics"
-  | "interview-prep";
+  | "interview-prep"
+  | "case-studies";
 
 export interface Module {
   id: string;
